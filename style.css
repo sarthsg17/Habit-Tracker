@@ -1,7 +1,8 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
+    /* background-color: #00000060; */
+    background: url('/Images/Background Image/background-image.jpg') no-repeat center center/cover;
+    color: #ffffff;
     margin: 0;
     padding: 0;
     display: flex;
@@ -11,7 +12,7 @@ body {
 }
 
 .container {
-    background: white;
+    background: rgba(0, 0, 0, 0.568);
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -73,7 +74,7 @@ h1 {
 }
 
 .badge {
-    background: gold;
+    background: rgb(126, 52, 133);
     padding: 5px 10px;
     margin: 5px;
     border-radius: 5px;
@@ -90,7 +91,7 @@ h1 {
 }
 
 .chart-placeholder {
-    background: #ddd;
+    background: #5232328e;
     height: 100px;
     display: flex;
     justify-content: center;
