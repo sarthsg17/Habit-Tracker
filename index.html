@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px 0;
+            width: 80%;
+        }
+        .habit-list {
+            list-style: none;
+            padding: 0;
+        }
+        .habit-list li {
+            background: #ddd;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Habit Tracker</h2>
+        <input type="text" id="habitInput" placeholder="Enter a new habit">
+        <button onclick="addHabit()">Add Habit</button>
+        <ul class="habit-list" id="habitList"></ul>
+    </div>
+
+    <script>
+        function addHabit() {
+            let habitInput = document.getElementById('habitInput');
+            let habitList = document.getElementById('habitList');
+            if (habitInput.value.trim() !== "") {
+                let li = document.createElement('li');
+                li.innerHTML = `${habitInput.value} <button onclick="this.parentElement.remove()">Remove</button>`;
+                habitList.appendChild(li);
+                habitInput.value = "";
+            }
+        }
+    </script>
+</body>
+</html>
