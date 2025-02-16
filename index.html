@@ -4,60 +4,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Habit Tracker</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            text-align: center;
-        }
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        input, button {
-            padding: 10px;
-            margin: 10px 0;
-            width: 80%;
-        }
-        .habit-list {
-            list-style: none;
-            padding: 0;
-        }
-        .habit-list li {
-            background: #ddd;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h2>Habit Tracker</h2>
-        <input type="text" id="habitInput" placeholder="Enter a new habit">
-        <button onclick="addHabit()">Add Habit</button>
-        <ul class="habit-list" id="habitList"></ul>
+        <header>
+            <h1>Habit Tracker</h1>
+            <button id="themeToggle">🌙</button>
+        </header>
+        
+        <section class="habit-list">
+            <h2>Your Habits</h2>
+            <ul>
+                <li class="habit">
+                    <span>🏃‍♂️ Workout</span>
+                    <span class="streak">🔥 7-day streak</span>
+                    <button class="complete-btn">✔</button>
+                </li>
+                <li class="habit">
+                    <span📖 Read</span>
+                    <span class="streak">🔥 15-day streak</span>
+                    <button class="complete-btn">✔</button>
+                </li>
+                <li class="habit">
+                    <span>💧 Drink Water</span>
+                    <span class="streak">🔥 30-day streak</span>
+                    <button class="complete-btn">✔</button>
+                </li>
+            </ul>
+        </section>
+        
+        <section class="leaderboard">
+            <h2>Leaderboard</h2>
+            <ol>
+                <li>🏆 Alex - 45 days</li>
+                <li>🥈 Sam - 38 days</li>
+                <li>🥉 Jordan - 32 days</li>
+            </ol>
+        </section>
+        
+        <section class="achievements">
+            <h2>Achievements</h2>
+            <div class="badge">🥇 30-Day Streak</div>
+            <div class="badge">🥈 7-Day Streak</div>
+            <div class="badge">🏅 Consistency King</div>
+        </section>
+        
+        <section class="motivational-quote">
+            <h2>Daily Motivation</h2>
+            <p>"Success is the sum of small efforts, repeated day in and day out."</p>
+        </section>
+        
+        <section class="chart-section">
+            <h2>Your Progress</h2>
+            <div class="chart-placeholder">📊 (Graph here)</div>
+        </section>
     </div>
-
-    <script>
-        function addHabit() {
-            let habitInput = document.getElementById('habitInput');
-            let habitList = document.getElementById('habitList');
-            if (habitInput.value.trim() !== "") {
-                let li = document.createElement('li');
-                li.innerHTML = `${habitInput.value} <button onclick="this.parentElement.remove()">Remove</button>`;
-                habitList.appendChild(li);
-                habitInput.value = "";
-            }
-        }
-    </script>
 </body>
 </html>

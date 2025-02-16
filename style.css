@@ -1,0 +1,99 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 400px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+h1 {
+    font-size: 24px;
+}
+
+#themeToggle {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.habit-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.habit {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.streak {
+    color: orange;
+    font-weight: bold;
+}
+
+.complete-btn {
+    background: green;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.leaderboard ol {
+    padding: 0;
+}
+
+.achievements {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.badge {
+    background: gold;
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.motivational-quote {
+    font-style: italic;
+    text-align: center;
+}
+
+.chart-section {
+    text-align: center;
+    padding: 10px;
+}
+
+.chart-placeholder {
+    background: #ddd;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+}
