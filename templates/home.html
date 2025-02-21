@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Habit Tracker Logo">
+            <span class="app-name">Habit Tracker</span>
+        </div>
+    </nav>
+
+    <!-- Importance of Habits Section -->
+    <section class="importance">
+        <h2>Why Are Habits Important?</h2>
+        <p>
+            Habits shape our daily lives and define our success. 
+            Developing positive habits helps improve productivity, health, and overall well-being. 
+            Tracking habits regularly ensures consistency and long-term progress. 
+            Start today and build a better version of yourself!
+        </p>
+    </section>
+
+</body>
+</html>

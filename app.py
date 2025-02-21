@@ -1,16 +1,16 @@
-from flask import Flask 
+from flask import Flask, render_template
+from config import Config
 from models import db
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///habit_tracker.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config.from_object(Config)
 
 db.init_app(app)
 
 # Create a route for testing
 @app.route('/')
 def home():
-    return "Habit Tracker App"
+    return render_template('home.html')
 
 if __name__ == '__main__':
     with app.app_context():
