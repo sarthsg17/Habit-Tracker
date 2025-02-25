@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Badges | Habit Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Habit Tracker Logo">
+            <span class="app-name">Habit Tracker</span>
+        </div>
+        
+        <div class="nav-buttons">
+            <div class="dropdown">
+                <button class="dropbtn">👤 {{ username }} ▼</button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('main.badges') }}">Badges</a>
+                    <a href="{{ url_for('main.logout') }}">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Your Badges</h2>
+
+        {% if badges %}
+            <ul>
+                {% for badge in badges %}
+                    <li>{{ badge.name }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No badges earned yet.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

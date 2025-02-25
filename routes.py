@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from models import db, User, Activity
+from models import db, User, Activity, Badge
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+
 
 # Create a single Blueprint for all routes
 main_bp = Blueprint('main', __name__)
@@ -67,3 +68,15 @@ def logout():
     session.clear()
     flash("You have been logged out.", "info")
     return redirect(url_for('main.home'))
+
+@main_bp.route('/badges')
+def badges():
+    if 'user_id' not in session:
+        flash("You need to log in first.", "danger")
+        return redirect(url_for('main.login'))
+
+    user_id = session['user_id']
+    user_badges = Badge.query.filter_by(user_id=user_id).all()
+
+    return render_template('badges.html', username=session['username'], badges=user_badges)
+

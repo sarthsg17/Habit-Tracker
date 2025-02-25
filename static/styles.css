@@ -64,3 +64,49 @@ body {
     color: #555;
     line-height: 1.5;
 }
+
+/* Dropdown Button */
+.dropbtn {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+/* Dropdown Container */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 150px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    z-index: 1;
+}
+
+/* Links Inside the Dropdown */
+.dropdown-content a {
+    color: black;
+    padding: 10px 12px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Change Color on Hover */
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+/* Show the Dropdown When Hovering */
+.dropdown:hover .dropdown-content {
+    display: block;
+}

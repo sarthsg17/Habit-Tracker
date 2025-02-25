@@ -12,12 +12,24 @@
             <img src="{{ url_for('static', filename='logo.png') }}" alt="Habit Tracker Logo">
             <span class="app-name">Habit Tracker</span>
         </div>
+        
         <div class="nav-buttons">
-            <span class="username">Hello, {{ username }}</span>
-            <a href="{{ url_for('main.logout') }}" class="btn btn-outline">Logout</a>
+            {% if session['user_id'] %}
+                <div class="dropdown">
+                    <button class="dropbtn">👤 {{ session['username'] }} ▼</button>
+                    <div class="dropdown-content">
+                        <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+                        <a href="{{ url_for('main.badges') }}">Badges</a>
+                        <a href="{{ url_for('main.logout') }}">Logout</a>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{{ url_for('main.register') }}" class="btn">Register</a>
+                <a href="{{ url_for('main.login') }}" class="btn btn-outline">Login</a>
+            {% endif %}
         </div>
     </nav>
-
+    
     <div class="container">
         <h2>Your Habit Tracker</h2>
         
