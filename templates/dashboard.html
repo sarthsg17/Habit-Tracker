@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Habit Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Habit Tracker Logo">
+            <span class="app-name">Habit Tracker</span>
+        </div>
+        <div class="nav-buttons">
+            <span class="username">Hello, {{ username }}</span>
+            <a href="{{ url_for('main.logout') }}" class="btn btn-outline">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Your Habit Tracker</h2>
+        
+        {% if activities %}
+            <ul>
+                {% for activity in activities %}
+                    <li>{{ activity.name }} - Streak: {{ activity.streak }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No habits added yet.</p>
+        {% endif %}
+        
+        <a href="#" class="btn">Add Habit</a>
+    </div>
+</body>
+</html>

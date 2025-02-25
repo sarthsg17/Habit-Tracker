@@ -15,8 +15,14 @@
             <span class="app-name">Habit Tracker</span>
         </div>
         <div class="nav-buttons">
-            <a href="{{ url_for('main.register') }}" class="btn">Register</a>
-            <a href="{{ url_for('main.login') }}" class="btn btn-outline">Login</a>
+            {% if session['user_id'] %}
+                <span class="username">Hello, {{ session['username'] }}</span>
+                <a href="{{ url_for('main.dashboard') }}" class="btn">Dashboard</a>
+                <a href="{{ url_for('main.logout') }}" class="btn btn-outline">Logout</a>
+            {% else %}
+                <a href="{{ url_for('main.register') }}" class="btn">Register</a>
+                <a href="{{ url_for('main.login') }}" class="btn btn-outline">Login</a>
+            {% endif %}
         </div>
     </nav>
     
