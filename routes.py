@@ -37,10 +37,10 @@ def register():
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
+        identifier = request.form['identifier'] 
         password = request.form['password']
 
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter((User.email == identifier) | (User.username == identifier)).first()
 
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
