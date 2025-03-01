@@ -1,9 +1,9 @@
 /* Reset default styles */
 body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f4f4f4;
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
 }
 
 /* Navigation Bar */
@@ -11,8 +11,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #4CAF50;
-    padding: 15px 20px;
+    padding: 15px 30px;
+    background-color: #6200ea;
     color: white;
 }
 
@@ -22,7 +22,7 @@ body {
 }
 
 .logo img {
-    width: 40px;
+    /* width: 40px; */
     height: 40px;
     margin-right: 10px;
 }
@@ -30,6 +30,23 @@ body {
 .app-name {
     font-size: 20px;
     font-weight: bold;
+}
+
+.nav-buttons {
+    display: flex;
+    align-items: center;
+}
+.nav-buttons a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 5px;
+}
+
+.nav-buttons a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .nav-buttons .btn {
@@ -113,12 +130,13 @@ body {
 }
 
 .container {
-    width: 60%;
-    margin: 20px auto;
+    max-width: 800px;
+    margin: 40px auto;
     padding: 20px;
-    background: white;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
+    text-align: center;
 }
 
 .habit-form {
@@ -145,7 +163,7 @@ body {
 
 .habit-list {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 15px;
 }
 
@@ -153,16 +171,159 @@ body {
     background: white;
     padding: 15px;
     border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    width: 200px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    position: relative;
+}
+
+.habit-card h3 {
+    margin: 5px 0;
+    font-size: 18px;
+}
+
+.habit-card p {
+    font-size: 14px;
+    color: #666;
 }
 
 .complete-btn {
-    background: #28a745;
+    background-color: #28a745;
     color: white;
     border: none;
     padding: 8px 12px;
     border-radius: 5px;
     cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.complete-btn:hover {
+    background-color: #218838;
+}
+
+/* Edit and Delete Buttons */
+.edit-btn, .delete-btn {
+    text-decoration: none;
+    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: bold;
+}
+
+.edit-btn {
+    background-color: #ffc107;
+    color: black;
+    margin-right: 5px;
+}
+
+.edit-btn:hover {
+    background-color: #e0a800;
+}
+
+.delete-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+}
+
+/* Habit Form */
+.habit-form {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.habit-form input {
+    padding: 10px;
+    font-size: 16px;
+    width: 60%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.habit-form button {
+    background-color: #6200ea;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.habit-form button:hover {
+    background-color: #4b00c2;
+}
+
+/* Edit Habit Page */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+form input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+}
+
+form button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+form button:hover {
+    background-color: #0056b3;
+}
+
+/* Flash Messages */
+.flash {
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.flash.success {
+    background-color: #28a745;
+    color: white;
+}
+
+.flash.danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.flash.info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .habit-form {
+        flex-direction: column;
+    }
+
+    .habit-form input {
+        width: 100%;
+    }
 }

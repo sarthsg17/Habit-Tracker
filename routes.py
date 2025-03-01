@@ -115,3 +115,42 @@ def reset_streaks():
                 habit.streak = 0  # Reset streak if missed
                 db.session.commit()
 
+@main_bp.route('/edit_habit/<int:habit_id>', methods=['GET', 'POST'])
+def edit_habit(habit_id):
+    if 'user_id' not in session:
+        flash("Please log in first.", "danger")
+        return redirect(url_for('main.login'))
+
+    habit = Activity.query.get_or_404(habit_id)
+
+    if habit.user_id != session['user_id']:
+        flash("Unauthorized access!", "danger")
+        return redirect(url_for('main.dashboard'))
+
+    if request.method == 'POST':
+        new_name = request.form['habit_name']
+        habit.name = new_name
+        db.session.commit()
+        flash("Habit updated successfully!", "success")
+        return redirect(url_for('main.dashboard'))
+
+    return render_template('edit_habit.html', habit=habit)
+
+
+@main_bp.route('/delete_habit/<int:habit_id>', methods=['POST'])
+def delete_habit(habit_id):
+    if 'user_id' not in session:
+        flash("Please log in first.", "danger")
+        return redirect(url_for('main.login'))
+
+    habit = Activity.query.get_or_404(habit_id)
+
+    if habit.user_id != session['user_id']:
+        flash("Unauthorized access!", "danger")
+        return redirect(url_for('main.dashboard'))
+
+    db.session.delete(habit)
+    db.session.commit()
+    flash("Habit deleted successfully!", "success")
+    
+    return redirect(url_for('main.dashboard'))
