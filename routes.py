@@ -52,15 +52,24 @@ def login():
 
     return render_template('login.html')
 
-@main_bp.route('/dashboard')
+@main_bp.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     if 'user_id' not in session:
         flash("You need to log in first.", "danger")
         return redirect(url_for('main.login'))
 
     user_id = session['user_id']
-    activities = Activity.query.filter_by(user_id=user_id).all()
 
+    if request.method == 'POST':
+        habit_name = request.form.get('habit_name')
+
+        if habit_name:
+            new_habit = Activity(name=habit_name, user_id=user_id, streak=0, last_completed=None)
+            db.session.add(new_habit)
+            db.session.commit()
+            flash("Habit added successfully!", "success")
+
+    activities = Activity.query.filter_by(user_id=user_id).all()
     return render_template('dashboard.html', username=session['username'], activities=activities)
 
 @main_bp.route('/logout')

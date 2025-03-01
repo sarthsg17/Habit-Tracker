@@ -32,19 +32,33 @@
     </nav>
     
     <div class="container">
-        <h2>Your Habit Tracker</h2>
-        
-        {% if activities %}
-            <ul>
-                {% for activity in activities %}
-                    <li>{{ activity.name }} - Streak: {{ activity.streak }}</li>
+        <h2>Your Habits</h2>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
                 {% endfor %}
-            </ul>
-        {% else %}
-            <p>No habits added yet.</p>
-        {% endif %}
-        
-        <a href="#" class="btn">Add Habit</a>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Habit Form -->
+        <form method="POST" class="habit-form">
+            <input type="text" name="habit_name" placeholder="Enter a new habit..." required>
+            <button type="submit">Add Habit</button>
+        </form>
+
+        <!-- Habit List -->
+        <div class="habit-list">
+            {% for habit in activities %}
+                <div class="habit-card">
+                    <h3>{{ habit.name }}</h3>
+                    <p>Streak: {{ habit.streak }}</p>
+                    <button class="complete-btn">Complete Today</button>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 </body>
 </html>
