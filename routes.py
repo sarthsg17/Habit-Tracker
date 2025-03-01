@@ -149,7 +149,7 @@ def complete_habit(habit_id):
 
     print(f"✅ Updated: Streak = {habit.streak}, Last Completed = {habit.last_completed}")
 
-    return redirect(url_for('main.dashboard'))
+    return redirect(url_for('main.manage_habits'))
 
 def reset_streaks():
     with current_app.app_context():

@@ -22,7 +22,7 @@ class Activity(db.Model):
     name = db.Column(db.String(120), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     streak = db.Column(db.Integer, default=0)
-    last_completed = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    last_completed = db.Column(db.DateTime, default=None)
     def complete_habit(self):
         today = datetime.now(timezone.utc).date()
 

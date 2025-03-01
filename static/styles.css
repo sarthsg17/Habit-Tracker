@@ -245,3 +245,54 @@ p {
     color: #444;
     margin-bottom: 15px;
 }
+
+/* Habit Card Styling */
+.habit-card.add-habit {
+    background: linear-gradient(135deg, #ffffff, #ffffff);
+    color: rgb(0, 0, 0);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    max-width: 350px;
+    margin: 20px auto;
+}
+
+/* Floating Effect */
+.habit-card.add-habit:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Header */
+.habit-card.add-habit h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+/* Paragraph */
+.habit-card.add-habit p {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+/* Button Styling */
+.habit-card.add-habit .btn {
+    background: #28a745;
+    color: #000000;
+    padding: 12px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+/* Button Hover Effect */
+.habit-card.add-habit .btn:hover {
+    background: #ffffff;
+    color: #000000;
+    transform: scale(1.05);
+    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.5);
+}
