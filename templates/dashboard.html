@@ -53,15 +53,16 @@
         <div class="habit-list">
             {% for habit in activities %}
                 <div class="habit-card">
-                    <h3>{{ habit.name }}</h3>
-                    <p>Streak: {{ habit.streak }} 🔥</p>
-                    <p>Last Completed: {{ habit.last_completed.strftime('%Y-%m-%d') if habit.last_completed else "Not yet" }}</p>
+                <h3>{{ habit.name }}</h3>
+                <p>🔥 Streak: <strong id="streak-{{ habit.id }}">{{ habit.streak }}</strong></p>
+                <p>📅 Last Completed: {{ habit.last_completed.strftime('%Y-%m-%d') if habit.last_completed else "Not yet" }}</p>
 
-                    <form action="{{ url_for('main.complete_habit', habit_id=habit.id) }}" method="POST">
-                        <button type="submit" class="complete-btn">Complete ✅</button>
-                    </form>
-                </div>
+                <form action="{{ url_for('main.complete_habit', habit_id=habit.id) }}" method="POST">
+                    <button type="submit" class="complete-btn">Complete ✅</button>
+                </form>
+            </div>
             {% endfor %}
+
         </div>
     </div>
 </body>

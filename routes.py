@@ -61,6 +61,9 @@ def dashboard():
 
     user_id = session['user_id']
 
+    # Call reset streaks before fetching habits
+    reset_streaks()
+
     if request.method == 'POST':
         habit_name = request.form.get('habit_name')
 
@@ -72,6 +75,7 @@ def dashboard():
 
     activities = Activity.query.filter_by(user_id=user_id).all()
     return render_template('dashboard.html', username=session['username'], activities=activities)
+
 
 @main_bp.route('/logout')
 def logout():
@@ -92,16 +96,39 @@ def badges():
 
 @main_bp.route('/complete_habit/<int:habit_id>', methods=['POST'])
 def complete_habit(habit_id):
-    if 'user_id' not in session:
-        flash("You must be logged in to complete a habit!", "danger")
-        return redirect(url_for('main.login'))
-
     habit = Activity.query.get(habit_id)
-    if habit and habit.user_id == session['user_id']:
-        habit.complete_habit()
-        flash("Habit marked as complete!", "success")
+    if not habit:
+        flash("Habit not found!", "error")
+        return redirect(url_for('main.dashboard'))
+
+    today = datetime.now(timezone.utc).date()
+    print(f"Completing habit: {habit.name}, Last Completed: {habit.last_completed}, Current Streak: {habit.streak}")
+
+    if habit.last_completed:
+        last_date = habit.last_completed.date()
+
+        if last_date == today:
+            print("Already completed today, no changes.")
+            flash("You already completed this habit today!", "info")
+            return redirect(url_for('main.dashboard'))
+
+        if last_date == today - timedelta(days=1):
+            habit.streak += 1  # Increase streak
+            print(f"🔥 Streak increased to: {habit.streak}")
+        else:
+            habit.streak = 1  # Reset streak if a day is missed
+            print("❌ Missed a day, streak reset to 1")
     else:
-        flash("Habit not found or unauthorized!", "danger")
+        habit.streak = 1  # First-time completion
+        print("✅ First completion, streak set to 1")
+
+    habit.last_completed = datetime.now(timezone.utc)
+
+    db.session.add(habit)  # Ensure it's tracked
+    db.session.commit()
+    db.session.refresh(habit)  # Force refresh from DB
+
+    print(f"✅ Updated: Streak = {habit.streak}, Last Completed = {habit.last_completed}")
 
     return redirect(url_for('main.dashboard'))
 
@@ -111,7 +138,10 @@ def reset_streaks():
         habits = Activity.query.all()
 
         for habit in habits:
-            if habit.last_completed and habit.last_completed.date() < (today - timedelta(days=1)):
-                habit.streak = 0  # Reset streak if missed
-                db.session.commit()
-
+            if habit.last_completed:
+                last_completed_date = habit.last_completed.date()
+                
+                # Reset streak if the habit wasn't completed yesterday
+                if last_completed_date < (today - timedelta(days=1)):
+                    habit.streak = 0
+                    db.session.commit()
