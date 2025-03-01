@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from models import db, User, Activity, Badge
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+from flask import current_app
 
 
 # Create a single Blueprint for all routes
@@ -88,4 +89,29 @@ def badges():
     user_badges = Badge.query.filter_by(user_id=user_id).all()
 
     return render_template('badges.html', username=session['username'], badges=user_badges)
+
+@main_bp.route('/complete_habit/<int:habit_id>', methods=['POST'])
+def complete_habit(habit_id):
+    if 'user_id' not in session:
+        flash("You must be logged in to complete a habit!", "danger")
+        return redirect(url_for('main.login'))
+
+    habit = Activity.query.get(habit_id)
+    if habit and habit.user_id == session['user_id']:
+        habit.complete_habit()
+        flash("Habit marked as complete!", "success")
+    else:
+        flash("Habit not found or unauthorized!", "danger")
+
+    return redirect(url_for('main.dashboard'))
+
+def reset_streaks():
+    with current_app.app_context():
+        today = datetime.now(timezone.utc).date()
+        habits = Activity.query.all()
+
+        for habit in habits:
+            if habit.last_completed and habit.last_completed.date() < (today - timedelta(days=1)):
+                habit.streak = 0  # Reset streak if missed
+                db.session.commit()
 
