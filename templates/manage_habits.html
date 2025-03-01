@@ -43,12 +43,36 @@
             {% endif %}
         {% endwith %}
 
-        <!-- Button Card to Navigate to Habit Management Page -->
-        <div class="habit-card add-habit">
-            <h3>Manage Your Habits</h3>
-            <p>Click below to add new habits or view existing ones.</p>
-            <a href="{{ url_for('main.manage_habits') }}" class="btn">Go to Habit Manager →</a>
+        <!-- Habit Form -->
+        <form method="POST" action="{{ url_for('main.add_habit') }}" class="habit-form">
+            <input type="text" name="habit_name" placeholder="Enter a new habit..." required>
+            <button type="submit">Add Habit</button>
+        </form>
+
+        <!-- Habit List -->
+        <div class="habit-list">
+            {% if activities %}
+                {% for habit in activities %}
+                    <div class="habit-card">
+                        <h3>{{ habit.name }} 
+                            <!-- Edit Icon: Clicking this navigates to the edit page -->
+                            <a href="{{ url_for('main.edit_habit', habit_id=habit.id) }}" title="Edit Habit">✏️</a>
+                            <!-- Delete Icon: Clicking this navigates to a confirmation page -->
+                            <a href="{{ url_for('main.confirm_delete', habit_id=habit.id) }}" title="Delete Habit">🗑️</a>
+                        </h3>
+                        <p>Streak: {{ habit.streak }} 🔥</p>
+                        <p>Last Completed: {{ habit.last_completed.strftime('%Y-%m-%d') if habit.last_completed else "Not yet" }}</p>
+        
+                        <!-- Complete Habit Button -->
+                        <form action="{{ url_for('main.complete_habit', habit_id=habit.id) }}" method="POST">
+                            <button type="submit" class="complete-btn">Complete ✅</button>
+                        </form>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No habits found. <a href="{{ url_for('main.manage_habits') }}">Add a new habit</a></p>
+            {% endif %}
         </div>
-    </div>
+        
 </body>
 </html>

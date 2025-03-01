@@ -62,19 +62,8 @@ def dashboard():
     user_id = session['user_id']
 
     # Call reset streaks before fetching habits
-    reset_streaks()
-
-    if request.method == 'POST':
-        habit_name = request.form.get('habit_name')
-
-        if habit_name:
-            new_habit = Activity(name=habit_name, user_id=user_id, streak=0, last_completed=None)
-            db.session.add(new_habit)
-            db.session.commit()
-            flash("Habit added successfully!", "success")
-
-    activities = Activity.query.filter_by(user_id=user_id).all()
-    return render_template('dashboard.html', username=session['username'], activities=activities)
+    
+    return render_template('dashboard.html', username=session['username'])
 
 
 @main_bp.route('/logout')
@@ -93,6 +82,36 @@ def badges():
     user_badges = Badge.query.filter_by(user_id=user_id).all()
 
     return render_template('badges.html', username=session['username'], badges=user_badges)
+
+@main_bp.route('/add_habit', methods=['POST'])
+def add_habit():
+    if 'user_id' not in session:
+        flash("Please log in first.", "danger")
+        return redirect(url_for('main.login'))
+
+    habit_name = request.form.get('habit_name')
+    if not habit_name:
+        flash("Habit name cannot be empty.", "danger")
+        return redirect(url_for('main.dashboard'))
+
+    new_habit = Activity(name=habit_name, user_id=session['user_id'])
+    db.session.add(new_habit)
+    db.session.commit()
+
+    flash("Habit added successfully!", "success")
+    return redirect(url_for('main.manage_habits'))
+
+@main_bp.route('/fetch-habits')
+def fetch_habits():
+    if 'user_id' not in session:
+        flash("Please log in to view your habits.", "danger")
+        return redirect(url_for('main.login'))
+
+    # Fetch habits for the logged-in user
+    habits = Activity.query.filter_by(user_id=session['user_id']).all()
+    
+    return render_template('manage_activities.html', activities=habits)
+
 
 @main_bp.route('/complete_habit/<int:habit_id>', methods=['POST'])
 def complete_habit(habit_id):
@@ -189,4 +208,18 @@ def edit_habit(habit_id):
         return redirect(url_for('main.dashboard'))
     
     return render_template('edit_habit.html', habit=habit)
+
+@main_bp.route('/manage-habits')
+def manage_habits():
+    if 'user_id' not in session:
+        flash("Please log in to view your habits.", "danger")
+        return redirect(url_for('main.login'))
+
+    user_id = session['user_id']
+    habits = Activity.query.filter_by(user_id=user_id).all()
+
+    if not habits:
+        print("No habits found for this user.")  # Debugging output
+
+    return render_template('manage_habits.html', activities=habits)
 
