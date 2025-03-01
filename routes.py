@@ -145,3 +145,48 @@ def reset_streaks():
                 if last_completed_date < (today - timedelta(days=1)):
                     habit.streak = 0
                     db.session.commit()
+
+@main_bp.route('/confirm_delete/<int:habit_id>', methods=['GET', 'POST'])
+def confirm_delete(habit_id):
+    if 'user_id' not in session:
+        flash("Please log in first.", "danger")
+        return redirect(url_for('main.login'))
+    
+    habit = Activity.query.get_or_404(habit_id)
+    if habit.user_id != session['user_id']:
+        flash("Unauthorized action!", "danger")
+        return redirect(url_for('main.dashboard'))
+    
+    if request.method == 'POST':
+        # If the user confirms deletion
+        db.session.delete(habit)
+        db.session.commit()
+        flash("Habit deleted successfully!", "success")
+        return redirect(url_for('main.dashboard'))
+    
+    # GET: Render a confirmation page
+    return render_template('confirm_delete.html', habit=habit)
+
+@main_bp.route('/edit_habit/<int:habit_id>', methods=['GET', 'POST'])
+def edit_habit(habit_id):
+    if 'user_id' not in session:
+        flash("Please log in first.", "danger")
+        return redirect(url_for('main.login'))
+    
+    habit = Activity.query.get_or_404(habit_id)
+    if habit.user_id != session['user_id']:
+        flash("Unauthorized action!", "danger")
+        return redirect(url_for('main.dashboard'))
+    
+    if request.method == 'POST':
+        new_name = request.form.get('new_name')
+        if new_name:
+            habit.name = new_name  # Only updating the name, leaving streak intact.
+            db.session.commit()
+            flash("Habit updated successfully!", "success")
+        else:
+            flash("Habit name cannot be empty.", "danger")
+        return redirect(url_for('main.dashboard'))
+    
+    return render_template('edit_habit.html', habit=habit)
+

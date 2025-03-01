@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirm Delete | Habit Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Confirm Deletion</h2>
+        <p>Are you sure you want to delete the habit: <strong>{{ habit.name }}</strong>?</p>
+        <form method="POST">
+            <!-- Clicking this button confirms deletion -->
+            <button type="submit" class="delete-btn">Yes, Delete</button>
+        </form>
+        <!-- Cancel button: returns to dashboard -->
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline">Cancel</a>
+    </div>
+</body>
+</html>

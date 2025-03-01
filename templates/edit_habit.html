@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Habit | Habit Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Edit Habit</h2>
+        <form method="POST">
+            <label for="new_name">New Habit Name:</label>
+            <input type="text" name="new_name" id="new_name" value="{{ habit.name }}" required>
+            <button type="submit" class="edit-btn">Save Changes</button>
+        </form>
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline">Cancel</a>
+    </div>
+</body>
+</html>
