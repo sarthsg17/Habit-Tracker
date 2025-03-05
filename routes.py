@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from models import db, User, Activity, Badge
+from models import db, User, Activity, Badge, Admin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta, timezone
 from flask import current_app
@@ -35,23 +35,37 @@ def register():
 
     return render_template('register.html')
 
+
+
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        identifier = request.form['identifier'] 
+        identifier = request.form['identifier']
         password = request.form['password']
 
-        user = User.query.filter((User.email == identifier) | (User.username == identifier)).first()
+        # Check if logging in as admin
+        admin = Admin.query.filter_by(username=identifier).first()
+        if admin and check_password_hash(admin.password_hash, password):
+            session['user_id'] = admin.id
+            session['username'] = admin.username
+            session['is_admin'] = True  # Set admin flag in session
+            flash('Admin login successful!', 'success')
+            return redirect(url_for('main.admin_dashboard'))
 
+        # Regular user login
+        user = User.query.filter((User.email == identifier) | (User.username == identifier)).first()
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
-            session['username'] = user.username  # Store username in session
+            session['username'] = user.username
+            session['is_admin'] = False  # Regular user
             flash('Login successful!', 'success')
             return redirect(url_for('main.dashboard'))
-        else:
-            flash('Invalid credentials. Please try again.', 'danger')
+
+        flash('Invalid credentials. Please try again.', 'danger')
 
     return render_template('login.html')
+
+
 
 @main_bp.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
@@ -223,3 +237,17 @@ def manage_habits():
 
     return render_template('manage_habits.html', activities=habits)
 
+@main_bp.route('/admin_dashboard', methods=['GET'])
+def admin_dashboard():
+    if 'user_id' not in session:
+        flash("You need to log in first.", "danger")
+        return redirect(url_for('main.login'))
+
+    user_id = session['user_id']
+    admin = Admin.query.filter_by(id=user_id).first()
+
+    if not admin:
+        flash("Access denied. Admins only!", "danger")
+        return redirect(url_for('main.dashboard'))  # Redirect regular users
+
+    return render_template('admin_dashboard.html', username=session['username'])

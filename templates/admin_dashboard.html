@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Habit Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <span class="app-name">Admin Dashboard</span>
+        </div>
+        <div class="nav-buttons">
+            <a href="{{ url_for('main.logout') }}" class="btn btn-outline">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Manage Badges</h2>
+        <p>Here, you can create and manage badges for users.</p>
+    </div>
+</body>
+</html>

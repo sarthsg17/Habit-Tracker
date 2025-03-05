@@ -41,3 +41,24 @@ class Badge(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+class Admin(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False, default="admin")
+    password_hash = db.Column(db.String(200), nullable=False)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+# Function to create an admin user if it doesn’t exist
+    @staticmethod
+    def create_default_admin():
+        admin = Admin.query.filter_by(username="admin").first()
+        if not admin:
+            hashed_password = generate_password_hash("admin")  # Default password is 'admin'
+            new_admin = Admin(username="admin", password_hash=hashed_password)
+            db.session.add(new_admin)
+            db.session.commit()
