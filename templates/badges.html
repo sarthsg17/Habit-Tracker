@@ -39,7 +39,12 @@
         {% for badge in badges %}
         <div
           class="badge-card"
-          onclick="openBadgeModal('{{ badge.badge.name }}', '{{ badge.badge.description }}', '{{ url_for('static', filename='badges/' + badge.badge.image_filename) }}', '{{ badge.habit.name }}')"
+          onclick="openBadgeModal(
+            '{{ badge.badge.name }}', 
+            '{{ badge.badge.description }}', 
+            '{{ url_for('static', filename='badges/' + badge.badge.image_filename) }}', 
+            '{% if badge.habit %}{{ badge.habit.name }}{% else %}{{ badge.habit_name }}{% endif %}'
+          )"
         >
           <img
             src="{{ url_for('static', filename='badges/' + badge.badge.image_filename) }}"
@@ -47,7 +52,12 @@
             title="{{ badge.badge.name }}"
             class="badge-img"
           />
-          <p><strong>Habit:</strong> {{ badge.habit.name }}</p>
+          <p>
+            <strong>Habit:</strong> {% if badge.habit %} {{ badge.habit.name }}
+            {% else %} {{ badge.habit_name }}
+            <!-- Show stored name if habit is deleted -->
+            {% endif %}
+          </p>
           <p>{{ badge.badge.description }}</p>
           <p class="badge-earned">
             🏆 Earned on: {{ badge.awarded_at.strftime('%Y-%m-%d') }}
@@ -62,13 +72,13 @@
       {% endif %}
     </div>
 
-    <!-- Update Badge Modal to show habit name -->
+    <!-- Badge Modal -->
     <div id="badgeModal" class="modal">
       <div class="modal-content">
         <span class="close" onclick="closeBadgeModal()">&times;</span>
         <h2 id="modalBadgeName"></h2>
         <p id="modalHabitName"></p>
-        <!-- New: Show Habit Name -->
+        <!-- Show Habit Name -->
         <img
           id="modalBadgeImage"
           src=""
@@ -83,7 +93,7 @@
       function openBadgeModal(name, description, imageUrl, habitName) {
         document.getElementById("modalBadgeName").innerText = name;
         document.getElementById("modalHabitName").innerText =
-          "Habit: " + habitName; // Show Habit Name
+          "Habit: " + habitName;
         document.getElementById("modalBadgeDescription").innerText =
           description;
         document.getElementById("modalBadgeImage").src = imageUrl;

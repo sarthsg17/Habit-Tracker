@@ -70,6 +70,7 @@ class UserBadge(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     habit_id = db.Column(db.Integer, db.ForeignKey('activity.id'), nullable=False)
+    habit_name = db.Column(db.String(100), nullable=False)  # New column to store habit name
     badge_id = db.Column(db.Integer, db.ForeignKey('badge.id'), nullable=False)
     awarded_at = db.Column(db.DateTime, default=datetime.utcnow)
 

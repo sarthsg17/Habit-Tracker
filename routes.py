@@ -222,14 +222,16 @@ def confirm_delete(habit_id):
     habit = Activity.query.get_or_404(habit_id)
 
     if request.method == 'POST':
-        # Delete all UserBadge entries linked to this habit
-        UserBadge.query.filter_by(habit_id=habit_id).delete()
 
+        user_badges = UserBadge.query.filter_by(habit_id=habit_id).all()
+        for user_badge in user_badges:
+            user_badge.habit_name = habit.name
+            user_badge.habit_id = -1  # Remove habit reference but keep badge
         # Now delete the habit itself
         db.session.delete(habit)
         db.session.commit()
 
-        flash('Habit and its associated badges were deleted successfully!', 'success')
+        flash('Habit deleted successfully!', 'success')
         return redirect(url_for('main.manage_habits'))
 
     return render_template('confirm_delete.html', habit=habit)
