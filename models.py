@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 
 db = SQLAlchemy()
 
+### USER MODEL ###
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -17,31 +18,66 @@ class User(db.Model):
         return check_password_hash(self.password, password)
 
 
+### HABIT MODEL (Activity) ###
 class Activity(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     streak = db.Column(db.Integer, default=0)
     last_completed = db.Column(db.DateTime, default=None)
+
     def complete_habit(self):
         today = datetime.now(timezone.utc).date()
 
+        # Prevent multiple completions in one day
         if self.last_completed and self.last_completed.date() == today:
-            return  # Already completed today
+            return  
 
+        # If completed yesterday, increment streak
         if self.last_completed and self.last_completed.date() == (today - timedelta(days=1)):
-            self.streak += 1  # Increment streak if completed consecutively
+            self.streak += 1
         else:
             self.streak = 1  # Reset streak if a day is missed
 
         self.last_completed = datetime.now(timezone.utc)
         db.session.commit()
 
+        # Award badge if conditions match
+        self.check_and_award_badges()
+
+    def check_and_award_badges(self):
+        badges = Badge.query.filter(Badge.streak_required == self.streak).all()
+        for badge in badges:
+            existing_badge = UserBadge.query.filter_by(user_id=self.user_id, habit_id=self.id, badge_id=badge.id).first()
+            if not existing_badge:  # Avoid duplicate badge
+                new_user_badge = UserBadge(user_id=self.user_id, habit_id=self.id, badge_id=badge.id)
+                db.session.add(new_user_badge)
+                db.session.commit()
+
+
+### BADGE MODEL (Created by Admin) ###
 class Badge(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    name = db.Column(db.String(100), nullable=False, unique=True)  # Badge name
+    description = db.Column(db.Text, nullable=True)  # Description
+    streak_required = db.Column(db.Integer, nullable=False)  # Streak condition
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    image_filename = db.Column(db.String(255), nullable=False)
 
+
+### USER BADGE MODEL (Tracks Earned Badges) ###
+class UserBadge(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    habit_id = db.Column(db.Integer, db.ForeignKey('activity.id'), nullable=False)
+    badge_id = db.Column(db.Integer, db.ForeignKey('badge.id'), nullable=False)
+    awarded_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('earned_badges', lazy=True))
+    badge = db.relationship('Badge', backref=db.backref('awarded_to', lazy=True))
+
+
+### ADMIN MODEL ###
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False, default="admin")
@@ -53,7 +89,6 @@ class Admin(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-# Function to create an admin user if it doesn’t exist
     @staticmethod
     def create_default_admin():
         admin = Admin.query.filter_by(username="admin").first()

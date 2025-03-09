@@ -56,7 +56,8 @@
                     <div class="habit-card">
                         <h3>{{ habit.name }} 
                             <!-- Edit Icon: Clicking this navigates to the edit page -->
-                            <a href="{{ url_for('main.edit_habit', habit_id=habit.id) }}" title="Edit Habit">✏️</a>
+                            <a href="{{ url_for('main.edit_habit', habit_id=habit.id) if habit.id else '#' }}" title="Edit Habit">✏️</a>
+
                             <!-- Delete Icon: Clicking this navigates to a confirmation page -->
                             <a href="{{ url_for('main.confirm_delete', habit_id=habit.id) }}" title="Delete Habit">🗑️</a>
                         </h3>

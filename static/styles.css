@@ -296,3 +296,266 @@ p {
     transform: scale(1.05);
     box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.5);
 }
+
+
+.badge-earned {
+    font-size: 12px;
+    color: #666;
+}
+
+/* Form Heading */
+#badge-form-heading {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Badge Form Styling */
+#badge-form {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Labels */
+.badge-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+/* Inputs & Textarea */
+.badge-input,
+.badge-textarea,
+.badge-file-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Submit Button */
+#badge-submit-btn {
+    width: 100%;
+    padding: 10px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#badge-submit-btn:hover {
+    background: #218838;
+}
+
+/* Existing Badges Heading */
+#existing-badges-heading {
+    text-align: center;
+    color: #333;
+    margin-top: 30px;
+}
+
+/* Badge List */
+#badge-list {
+    list-style: none;
+    padding: 0;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Badge Item */
+.badge-item {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Badge Image */
+.badge-image {
+    width: 50px;
+    height: 50px;
+    margin-right: 15px;
+    border-radius: 5px;
+}
+
+/* Badge Name */
+.badge-name {
+    flex: 1;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Badge Streak */
+.badge-streak {
+    color: #666;
+    font-size: 14px;
+}
+
+/* Modal Background */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Modal Content Box */
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    width: 50%;
+    border-radius: 8px;
+    text-align: center;
+    position: relative;
+}
+
+/* Close Button */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+/* Modal Image */
+.modal-badge-img {
+    width: 120px;
+    height: 120px;
+    margin: 15px 0;
+    border-radius: 50%;
+}
+
+/* Badge Grid */
+.badge-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+
+/* Badge Card */
+.badge-card {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 200px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.badge-card:hover {
+    transform: scale(1.05);
+}
+
+/* Badge Image */
+.badge-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #4CAF50; /* Green */
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+  
+  .btn:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+  }
+  
+  .btn:active {
+    background-color: #3e8e41;
+    transform: scale(0.95);
+  }
+
+
+  /* Overall badge list container */
+#badge-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  /* Individual badge item */
+  .badge-item {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    width: 180px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  /* Hover effect */
+  .badge-item:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Badge image */
+  .badge-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #007bff;
+  }
+  
+  /* Badge name */
+  .badge-name {
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 10px;
+    color: #333;
+  }
+  
+  /* Streak required */
+  .badge-streak {
+    font-size: 14px;
+    color: #555;
+    margin-top: 5px;
+  }
+  
+  /* Total badge counter */
+  #total-badges {
+    font-size: 18px;
+    font-weight: bold;
+    color: #007bff;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  

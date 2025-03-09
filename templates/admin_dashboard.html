@@ -1,24 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard | Habit Tracker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
     <nav class="navbar">
-        <div class="logo">
-            <span class="app-name">Admin Dashboard</span>
-        </div>
-        <div class="nav-buttons">
-            <a href="{{ url_for('main.logout') }}" class="btn btn-outline">Logout</a>
-        </div>
+      <div class="logo">
+        <span class="app-name">Admin Dashboard</span>
+      </div>
+      <div class="nav-buttons">
+        <a href="{{ url_for('main.logout') }}" class="btn btn-outline"
+          >Logout</a
+        >
+      </div>
     </nav>
 
-    <div class="container">
-        <h2>Manage Badges</h2>
-        <p>Here, you can create and manage badges for users.</p>
-    </div>
-</body>
+    <h2 id="badge-form-heading">Create a New Badge</h2>
+
+    <form
+      method="POST"
+      action="{{ url_for('main.create_badge') }}"
+      enctype="multipart/form-data"
+      id="badge-form"
+    >
+      <label for="name" class="badge-label">Badge Name:</label>
+      <input type="text" name="name" required class="badge-input" />
+
+      <label for="streak_required" class="badge-label">Streak Required:</label>
+      <input
+        type="number"
+        name="streak_required"
+        required
+        class="badge-input"
+      />
+
+      <label for="description" class="badge-label">Description:</label>
+      <textarea name="description" class="badge-textarea"></textarea>
+
+      <label for="badge_image" class="badge-label">Badge Image:</label>
+      <input
+        type="file"
+        name="badge_image"
+        accept="image/*"
+        required
+        class="badge-file-input"
+      />
+
+      <button type="submit" id="badge-submit-btn">Create Badge</button>
+    </form>
+
+    <h2 id="existing-badges-heading">Existing Badges</h2>
+
+    <p id="total-badges">Total Badges: {{ badges|length }}</p>
+
+    <ul id="badge-list">
+      {% for badge in badges %}
+      <li class="badge-item badge-{{ loop.index }}">
+        <img
+          src="{{ url_for('static', filename='badges/' ~ badge.image_filename) }}"
+          alt="Badge Image"
+          class="badge-image"
+          id="badge-img-{{ loop.index }}"
+        />
+
+        <div class="badge-details">
+          <strong class="badge-name" id="badge-name-{{ loop.index }}"
+            >{{ badge.name }}</strong
+          >
+          <span class="badge-streak" id="badge-streak-{{ loop.index }}">
+            Requires {{ badge.streak_required }} days streak
+          </span>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </body>
 </html>

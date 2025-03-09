@@ -1,42 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Badges | Habit Tracker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
     <nav class="navbar">
-        <div class="logo">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Habit Tracker Logo">
-            <span class="app-name">Habit Tracker</span>
+      <div class="logo">
+        <img
+          src="{{ url_for('static', filename='logo.png') }}"
+          alt="Habit Tracker Logo"
+        />
+        <span class="app-name">Habit Tracker</span>
+      </div>
+
+      <div class="nav-buttons">
+        <div class="dropdown">
+          <button class="dropbtn">👤 {{ session['username'] }} ▼</button>
+          <div class="dropdown-content">
+            <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('main.badges') }}">Badges</a>
+            <a href="{{ url_for('main.logout') }}">Logout</a>
+          </div>
         </div>
-        
-        <div class="nav-buttons">
-            <div class="dropdown">
-                <button class="dropbtn">👤 {{ username }} ▼</button>
-                <div class="dropdown-content">
-                    <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-                    <a href="{{ url_for('main.badges') }}">Badges</a>
-                    <a href="{{ url_for('main.logout') }}">Logout</a>
-                </div>
-            </div>
-        </div>
+      </div>
     </nav>
 
     <div class="container">
-        <h2>Your Badges</h2>
+      <h2>Your Badges</h2>
 
-        {% if badges %}
-            <ul>
-                {% for badge in badges %}
-                    <li>{{ badge.name }}</li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No badges earned yet.</p>
-        {% endif %}
+      {% if badges %}
+      <div class="badge-grid">
+        {% for badge in badges %}
+        <div
+          class="badge-card"
+          onclick="openBadgeModal('{{ badge.badge.name }}', '{{ badge.badge.description }}', '{{ url_for('static', filename='badges/' + badge.badge.image_filename) }}', '{{ badge.habit.name }}')"
+        >
+          <img
+            src="{{ url_for('static', filename='badges/' + badge.badge.image_filename) }}"
+            alt="{{ badge.badge.name }}"
+            title="{{ badge.badge.name }}"
+            class="badge-img"
+          />
+          <p><strong>Habit:</strong> {{ badge.habit.name }}</p>
+          <p>{{ badge.badge.description }}</p>
+          <p class="badge-earned">
+            🏆 Earned on: {{ badge.awarded_at.strftime('%Y-%m-%d') }}
+          </p>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p>
+        No badges earned yet. Keep tracking your habits to unlock achievements!
+      </p>
+      {% endif %}
     </div>
-</body>
+
+    <!-- Update Badge Modal to show habit name -->
+    <div id="badgeModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeBadgeModal()">&times;</span>
+        <h2 id="modalBadgeName"></h2>
+        <p id="modalHabitName"></p>
+        <!-- New: Show Habit Name -->
+        <img
+          id="modalBadgeImage"
+          src=""
+          alt="Badge Image"
+          class="modal-badge-img"
+        />
+        <p id="modalBadgeDescription"></p>
+      </div>
+    </div>
+
+    <script>
+      function openBadgeModal(name, description, imageUrl, habitName) {
+        document.getElementById("modalBadgeName").innerText = name;
+        document.getElementById("modalHabitName").innerText =
+          "Habit: " + habitName; // Show Habit Name
+        document.getElementById("modalBadgeDescription").innerText =
+          description;
+        document.getElementById("modalBadgeImage").src = imageUrl;
+        document.getElementById("badgeModal").style.display = "block";
+      }
+
+      function closeBadgeModal() {
+        document.getElementById("badgeModal").style.display = "none";
+      }
+
+      // Close modal if user clicks outside of content
+      window.onclick = function (event) {
+        var modal = document.getElementById("badgeModal");
+        if (event.target === modal) {
+          modal.style.display = "none";
+        }
+      };
+    </script>
+  </body>
 </html>
