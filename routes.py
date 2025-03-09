@@ -258,3 +258,9 @@ def edit_habit(habit_id):
 
     return render_template('edit_habit.html', habit=habit)
 
+@main_bp.route('/calendar')
+def calendar():
+    if 'user_id' not in session:
+        flash("Please log in first.", "danger")
+        return redirect(url_for('main.login'))
+    return render_template('calendar.html')

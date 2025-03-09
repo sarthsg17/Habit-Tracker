@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Calendar | Habit Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Habit Tracker Logo">
+            <span class="app-name">Habit Tracker</span>
+        </div>
+
+        <div class="nav-buttons">
+            <a href="{{ url_for('main.dashboard') }}" class="btn">← Back to Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>📅 Live Calendar</h2>
+        <iframe src="https://calendar.google.com/calendar/embed?src=your_calendar_id&ctz=your_timezone" 
+                style="border: 0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
+    </div>
+</body>
+</html>
