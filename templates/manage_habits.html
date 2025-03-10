@@ -62,6 +62,16 @@
                             <a href="{{ url_for('main.confirm_delete', habit_id=habit.id) }}" title="Delete Habit">🗑️</a>
                         </h3>
                         <p>Streak: {{ habit.streak }} 🔥</p>
+                        <div class="progress-container">
+                            <div class="progress-bar 
+                                {% if habit.streak <= 5 %} low 
+                                {% elif habit.streak <= 10 %} medium 
+                                {% else %} high 
+                                {% endif %}" 
+                                style="width: {{ (habit.streak / 30) * 100 }}%;">
+                                {{ habit.streak }} days
+                            </div>
+                        </div>
                         <p>Last Completed: {{ habit.last_completed.strftime('%Y-%m-%d') if habit.last_completed else "Not yet" }}</p>
         
                         <!-- Complete Habit Button -->

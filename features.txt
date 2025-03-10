@@ -3,7 +3,9 @@
     Users can see their habit completion in a calendar format
     Helps track long-term consistency
 
-2. 📊 Habit Streaks & Progress Visualization
+    ===========CALENDER ADDED=============
+
+2. 📊 Habit Streaks & Progress Visualization (COMPLETED)
 
     Display streaks (e.g., "You've completed this habit for 10 days in a row!")
     Use charts (bar graph, pie chart) to show progress
@@ -23,7 +25,7 @@
     Send email or push notifications for incomplete habits
     Popup reminders within the app
 
-6. 🎖 Badges & Rewards System
+6. 🎖 Badges & Rewards System (COMPLETED) 
 
     Reward users with virtual badges for completing habits consistently
     Example: "Early Riser" badge for waking up early 30 days in a row

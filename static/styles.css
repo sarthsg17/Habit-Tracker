@@ -596,3 +596,26 @@ p {
 }
   
   
+/* Progress Bar Styling */
+.progress-container {
+    width: 100%;
+    background-color: #08ecd9c7;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+.progress-bar {
+    height: 20px;
+    text-align: center;
+    line-height: 20px;
+    font-size: 14px;
+    color: white;
+    border-radius: 10px;
+    transition: width 0.5s ease-in-out;
+}
+
+/* Dynamic Colors */
+.low { background-color: #f76c6c; } /* Red for low streaks */
+.medium { background-color: #f7c66c; } /* Yellow for medium */
+.high { background-color: #6cf76c; } /* Green for high streaks */
