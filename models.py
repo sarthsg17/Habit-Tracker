@@ -25,6 +25,7 @@ class Activity(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     streak = db.Column(db.Integer, default=0)
     last_completed = db.Column(db.DateTime, default=None)
+    date_added = db.Column(db.Date, default=datetime.utcnow)
 
     def complete_habit(self):
         today = datetime.now(timezone.utc).date()
@@ -54,6 +55,14 @@ class Activity(db.Model):
                 db.session.add(new_user_badge)
                 db.session.commit()
 
+### CALENDAR EVENT MODEL ###
+class CalendarEvent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    event_type = db.Column(db.String(50), nullable=False)  # "habit" or "note"
+    habit_id = db.Column(db.Integer, db.ForeignKey('activity.id'), nullable=True)  # Link to habits
+    note = db.Column(db.Text, nullable=True)  # Allow users to add custom notes
 
 ### BADGE MODEL (Created by Admin) ###
 class Badge(db.Model):

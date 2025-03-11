@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from models import db, User, Activity, Badge, Admin, UserBadge
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
+from models import db, User, Activity, Badge, Admin, UserBadge, CalendarEvent
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta, timezone
 from flask import current_app
@@ -264,3 +264,70 @@ def calendar():
         flash("Please log in first.", "danger")
         return redirect(url_for('main.login'))
     return render_template('calendar.html')
+
+### FETCH ALL CALENDAR EVENTS FOR A USER ###
+@main_bp.route('/calendar/<int:user_id>', methods=['GET'])
+def get_calendar_events(user_id):
+    """
+    Get all calendar events (habits and notes) for a specific user.
+    """
+    events = CalendarEvent.query.filter_by(user_id=user_id).all()
+
+    event_list = []
+    for event in events:
+        event_list.append({
+            "id": event.id,
+            "date": event.date.strftime("%Y-%m-%d"),
+            "event_type": event.event_type,
+            "habit_id": event.habit_id,
+            "note": event.note
+        })
+
+    return jsonify({"events": event_list}), 200
+
+
+### FETCH HABIT COMPLETION HISTORY ###
+@main_bp.route('/calendar/habits/<int:user_id>', methods=['GET'])
+def get_habit_history(user_id):
+    """
+    Get all habit completion records for a user.
+    """
+    habits = Activity.query.filter_by(user_id=user_id).all()
+
+    habit_history = []
+    for habit in habits:
+        habit_history.append({
+            "habit_id": habit.id,
+            "name": habit.name,
+            "last_completed": habit.last_completed.strftime("%Y-%m-%d") if habit.last_completed else None,
+            "streak": habit.streak
+        })
+
+    return jsonify({"habit_history": habit_history}), 200
+
+
+### ADD NOTES TO THE CALENDAR ###
+@main_bp.route('/calendar/add_note', methods=['POST'])
+def add_calendar_note():
+    """
+    Add a custom note to the user's calendar.
+    """
+    data = request.get_json()
+    user_id = data.get("user_id")
+    date_str = data.get("date")
+    note = data.get("note")
+
+    if not user_id or not date_str or not note:
+        return jsonify({"error": "Missing required fields"}), 400
+
+    # Convert string to date
+    try:
+        date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        return jsonify({"error": "Invalid date format. Use YYYY-MM-DD"}), 400
+
+    new_note = CalendarEvent(user_id=user_id, date=date, event_type="note", note=note)
+    db.session.add(new_note)
+    db.session.commit()
+
+    return jsonify({"message": "Note added successfully"}), 201
