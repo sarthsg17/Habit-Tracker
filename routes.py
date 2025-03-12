@@ -168,7 +168,7 @@ def complete_habit(habit_id):
 
     if habit.last_completed and habit.last_completed.date() == today:
         flash("You have already completed this habit today.", "warning")
-        return redirect(url_for('main.dashboard'))
+        return redirect(url_for('main.manage_habits'))
 
     # Update streak
     if habit.last_completed and habit.last_completed.date() == today - timedelta(days=1):
@@ -188,7 +188,7 @@ def complete_habit(habit_id):
             flash(f"🎉 You earned a new badge: {badge.name}!", "success")
 
     db.session.commit()
-    return redirect(url_for('main.dashboard'))
+    return redirect(url_for('main.manage_habits'))
 
 # Create a Badge (Admin Only)
 @main_bp.route('/admin/create_badge', methods=['POST'])
@@ -258,6 +258,7 @@ def edit_habit(habit_id):
 
     return render_template('edit_habit.html', habit=habit)
 
+### DISPLAY CALENDAR PAGE ###
 @main_bp.route('/calendar')
 def calendar():
     if 'user_id' not in session:
@@ -265,59 +266,72 @@ def calendar():
         return redirect(url_for('main.login'))
     return render_template('calendar.html')
 
-### FETCH ALL CALENDAR EVENTS FOR A USER ###
-@main_bp.route('/calendar/<int:user_id>', methods=['GET'])
-def get_calendar_events(user_id):
+
+### FETCH USER-SPECIFIC CALENDAR EVENTS ###
+@main_bp.route('/calendar/events', methods=['GET'])
+def get_calendar_events():
     """
-    Get all calendar events (habits and notes) for a specific user.
+    Get all calendar events (habits and notes) for the logged-in user.
     """
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    user_id = session['user_id']
     events = CalendarEvent.query.filter_by(user_id=user_id).all()
 
-    event_list = []
-    for event in events:
-        event_list.append({
+    event_list = [
+        {
             "id": event.id,
             "date": event.date.strftime("%Y-%m-%d"),
             "event_type": event.event_type,
             "habit_id": event.habit_id,
             "note": event.note
-        })
+        }
+        for event in events
+    ]
 
     return jsonify({"events": event_list}), 200
 
 
-### FETCH HABIT COMPLETION HISTORY ###
-@main_bp.route('/calendar/habits/<int:user_id>', methods=['GET'])
-def get_habit_history(user_id):
+### FETCH USER-SPECIFIC HABIT HISTORY ###
+@main_bp.route('/calendar/habits', methods=['GET'])
+def get_habit_history():
     """
-    Get all habit completion records for a user.
+    Get all habit completion records for the logged-in user.
     """
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    user_id = session['user_id']
     habits = Activity.query.filter_by(user_id=user_id).all()
 
-    habit_history = []
-    for habit in habits:
-        habit_history.append({
+    habit_history = [
+        {
             "habit_id": habit.id,
             "name": habit.name,
             "last_completed": habit.last_completed.strftime("%Y-%m-%d") if habit.last_completed else None,
             "streak": habit.streak
-        })
+        }
+        for habit in habits
+    ]
 
     return jsonify({"habit_history": habit_history}), 200
 
 
-### ADD NOTES TO THE CALENDAR ###
+### ADD NOTE TO CALENDAR ###
 @main_bp.route('/calendar/add_note', methods=['POST'])
 def add_calendar_note():
     """
-    Add a custom note to the user's calendar.
+    Add a user-specific note to the calendar.
     """
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
     data = request.get_json()
-    user_id = data.get("user_id")
     date_str = data.get("date")
     note = data.get("note")
 
-    if not user_id or not date_str or not note:
+    if not date_str or not note:
         return jsonify({"error": "Missing required fields"}), 400
 
     # Convert string to date
@@ -326,8 +340,57 @@ def add_calendar_note():
     except ValueError:
         return jsonify({"error": "Invalid date format. Use YYYY-MM-DD"}), 400
 
+    user_id = session['user_id']
     new_note = CalendarEvent(user_id=user_id, date=date, event_type="note", note=note)
     db.session.add(new_note)
     db.session.commit()
 
     return jsonify({"message": "Note added successfully"}), 201
+
+
+### EDIT EXISTING NOTE ###
+@main_bp.route('/calendar/edit_note/<int:note_id>', methods=['PUT'])
+def edit_calendar_note(note_id):
+    """
+    Edit an existing note for the logged-in user.
+    """
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    user_id = session['user_id']
+    note = CalendarEvent.query.filter_by(id=note_id, user_id=user_id, event_type="note").first()
+
+    if not note:
+        return jsonify({"error": "Note not found"}), 404
+
+    data = request.get_json()
+    updated_note = data.get("note")
+
+    if not updated_note:
+        return jsonify({"error": "Note content is required"}), 400
+
+    note.note = updated_note
+    db.session.commit()
+
+    return jsonify({"message": "Note updated successfully"}), 200
+
+
+### DELETE A NOTE ###
+@main_bp.route('/calendar/delete_note/<int:note_id>', methods=['DELETE'])
+def delete_calendar_note(note_id):
+    """
+    Delete a note for the logged-in user.
+    """
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    user_id = session['user_id']
+    note = CalendarEvent.query.filter_by(id=note_id, user_id=user_id, event_type="note").first()
+
+    if not note:
+        return jsonify({"error": "Note not found"}), 404
+
+    db.session.delete(note)
+    db.session.commit()
+
+    return jsonify({"message": "Note deleted successfully"}), 200

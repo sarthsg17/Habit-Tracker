@@ -6,10 +6,11 @@
     <title>Habit Tracker Calendar</title>
     
     <!-- FullCalendar CSS -->
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
 
-<!-- FullCalendar JS -->
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
@@ -48,6 +49,11 @@
             text-decoration: none;
             cursor: pointer;
         }
+        .button-group {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -56,36 +62,45 @@
     
     <div id="calendar"></div>
 
-    <!-- Modal for Adding Notes -->
+    <!-- Modal for Adding/Editing Notes -->
     <div id="noteModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>Add/Edit Note</h2>
+            <input type="hidden" id="modal-note-id">
             <input type="hidden" id="modal-date">
             <textarea id="note-text" rows="4" style="width:100%;" placeholder="Enter your note here..."></textarea>
-            <button id="save-note">Save Note</button>
+            <div class="button-group">
+                <button id="save-note">Save</button>
+                <button id="delete-note" style="display:none; background-color: red; color: white;">Delete</button>
+            </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            let userId = 1;  // Change this dynamically based on the logged-in user
+            let userId = "{{ session['user_id'] }}"; // Get user ID from session
             let calendarEl = document.getElementById('calendar');
 
             let calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 selectable: true,
                 dateClick: function (info) {
-                    openNoteModal(info.dateStr);
+                    openNoteModal(info.dateStr, null, ""); // Open modal for a new note
+                },
+                eventClick: function (info) {
+                    let event = info.event.extendedProps;
+                    openNoteModal(info.event.startStr, event.noteId, event.note); // Open modal to edit note
                 },
                 events: function (fetchInfo, successCallback, failureCallback) {
-                    fetch(`/calendar/${userId}`)
+                    fetch(`/calendar/events`)
                         .then(response => response.json())
                         .then(data => {
                             let events = data.events.map(event => ({
                                 title: event.event_type === 'habit' ? '✔️ ' + event.habit_name : '📝 ' + event.note,
                                 start: event.date,
                                 extendedProps: {
+                                    noteId: event.event_type === 'note' ? event.id : null,
                                     note: event.note,
                                     eventType: event.event_type
                                 }
@@ -105,8 +120,18 @@
             let modal = document.getElementById('noteModal');
             let closeBtn = document.getElementsByClassName('close')[0];
 
-            function openNoteModal(date) {
+            function openNoteModal(date, noteId, noteText) {
                 document.getElementById('modal-date').value = date;
+                document.getElementById('modal-note-id').value = noteId || "";
+                document.getElementById('note-text').value = noteText || "";
+
+                let deleteBtn = document.getElementById('delete-note');
+                if (noteId) {
+                    deleteBtn.style.display = "block";
+                } else {
+                    deleteBtn.style.display = "none";
+                }
+
                 modal.style.display = "block";
             }
 
@@ -123,20 +148,55 @@
             document.getElementById('save-note').addEventListener('click', function () {
                 let date = document.getElementById('modal-date').value;
                 let note = document.getElementById('note-text').value;
+                let noteId = document.getElementById('modal-note-id').value;
 
-                fetch('/calendar/add_note', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: userId, date: date, note: note })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    modal.style.display = "none";
-                    calendar.refetchEvents(); // Refresh calendar
-                })
-                .catch(error => console.error('Error:', error));
+                if (noteId) {
+                    // Edit existing note
+                    fetch(`/calendar/edit_note/${noteId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ note: note })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                        modal.style.display = "none";
+                        calendar.refetchEvents();
+                    })
+                    .catch(error => console.error('Error:', error));
+                } else {
+                    // Add new note
+                    fetch('/calendar/add_note', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ date: date, note: note })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                        modal.style.display = "none";
+                        calendar.refetchEvents();
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
             });
+
+            document.getElementById('delete-note').addEventListener('click', function () {
+                let noteId = document.getElementById('modal-note-id').value;
+                if (confirm("Are you sure you want to delete this note?")) {
+                    fetch(`/calendar/delete_note/${noteId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                        modal.style.display = "none";
+                        calendar.refetchEvents();
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            });
+
         });
     </script>
 

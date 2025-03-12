@@ -63,6 +63,7 @@ class CalendarEvent(db.Model):
     event_type = db.Column(db.String(50), nullable=False)  # "habit" or "note"
     habit_id = db.Column(db.Integer, db.ForeignKey('activity.id'), nullable=True)  # Link to habits
     note = db.Column(db.Text, nullable=True)  # Allow users to add custom notes
+    user = db.relationship('User', backref=db.backref('calendar_notes', lazy=True))
 
 ### BADGE MODEL (Created by Admin) ###
 class Badge(db.Model):
