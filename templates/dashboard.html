@@ -1,70 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard | Habit Tracker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
     <nav class="navbar">
-        <div class="logo">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Habit Tracker Logo">
-            <span class="app-name">Habit Tracker</span>
-        </div>
+      <div class="logo">
+        <img
+          src="{{ url_for('static', filename='logo.png') }}"
+          alt="Habit Tracker Logo"
+        />
+        <span class="app-name">Habit Tracker</span>
+      </div>
 
-        <div class="nav-buttons">
-            {% if session['user_id'] %}
-            <div class="dropdown">
-                <button class="dropbtn">👤 {{ session['username'] }} ▼</button>
-                <div class="dropdown-content">
-                    <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-                    <a href="{{ url_for('main.badges') }}">Badges</a>
-                    <a href="{{ url_for('main.logout') }}">Logout</a>
-                </div>
-            </div>
-            {% else %}
-            <a href="{{ url_for('main.register') }}" class="btn">Register</a>
-            <a href="{{ url_for('main.login') }}" class="btn btn-outline">Login</a>
-            {% endif %}
+      <div class="nav-buttons">
+        {% if session['user_id'] %}
+        <div class="dropdown">
+          <button class="dropbtn">👤 {{ session['username'] }} ▼</button>
+          <div class="dropdown-content">
+            <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('main.badges') }}">Badges</a>
+            <a href="{{ url_for('main.calendar') }}">Calender</a>
+            <a href="{{ url_for('main.logout') }}">Logout</a>
+          </div>
         </div>
+        {% else %}
+        <a href="{{ url_for('main.register') }}" class="btn">Register</a>
+        <a href="{{ url_for('main.login') }}" class="btn btn-outline">Login</a>
+        {% endif %}
+      </div>
     </nav>
 
     <div class="container">
-        <h2>Your Dashboard</h2>
+      <h2>Your Dashboard</h2>
 
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash {{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %} {% endif %} {% endwith %}
 
-        <!-- Cards Container (Cards in a Straight Line) -->
-        <div class="cards-container">
-            <!-- Badge Card -->
-            <div class="card">
-                <h3>🏆 Your Achievements</h3>
-                <p>Check out the badges you’ve earned!</p>
-                <a href="{{ url_for('main.badges') }}" class="btn">View Badges</a>
-            </div>
-
-            <!-- Habit Manager Card -->
-            <div class="card">
-                <h3>📋 Manage Your Habits</h3>
-                <p>Click below to add new habits or view existing ones.</p>
-                <a href="{{ url_for('main.manage_habits') }}" class="btn">Go to Habit Manager</a>
-            </div>
-
-            <!-- Live Calendar Card -->
-            <div class="card">
-                <h3>📅 Live Calendar</h3>
-                <p>View and manage your habit streaks on the calendar.</p>
-                <a href="{{ url_for('main.calendar') }}" class="btn">View Calendar</a>
-            </div>
+      <!-- Cards Container (Cards in a Straight Line) -->
+      <div class="cards-container">
+        <!-- Badge Card -->
+        <div class="card">
+          <h3>🏆 Your Achievements</h3>
+          <p>Check out the badges you’ve earned!</p>
+          <a href="{{ url_for('main.badges') }}" class="btn">View Badges</a>
         </div>
+
+        <!-- Habit Manager Card -->
+        <div class="card">
+          <h3>📋 Manage Your Habits</h3>
+          <p>Click below to add new habits or view existing ones.</p>
+          <a href="{{ url_for('main.manage_habits') }}" class="btn"
+            >Go to Habit Manager</a
+          >
+        </div>
+
+        <!-- Live Calendar Card -->
+        <div class="card">
+          <h3>📅 Live Calendar</h3>
+          <p>View and manage your habit streaks on the calendar.</p>
+          <a href="{{ url_for('main.calendar') }}" class="btn">View Calendar</a>
+        </div>
+      </div>
     </div>
-</body>
+  </body>
 </html>

@@ -1,49 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Habit Tracker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
     <!-- Navigation Bar -->
     <nav class="navbar">
-        <div class="logo">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Habit Tracker Logo">
-            <span class="app-name">Habit Tracker</span>
+      <div class="logo">
+        <img
+          src="{{ url_for('static', filename='logo.png') }}"
+          alt="Habit Tracker Logo"
+        />
+        <span class="app-name">Habit Tracker</span>
+      </div>
+
+      <div class="nav-buttons">
+        {% if session['user_id'] %}
+        <div class="dropdown">
+          <button class="dropbtn">👤 {{ session['username'] }} ▼</button>
+          <div class="dropdown-content">
+            <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('main.badges') }}">Badges</a>
+            <a href="{{ url_for('main.calendar') }}">Calender</a>
+            <a href="{{ url_for('main.logout') }}">Logout</a>
+          </div>
         </div>
-        
-        <div class="nav-buttons">
-            {% if session['user_id'] %}
-                <div class="dropdown">
-                    <button class="dropbtn">👤 {{ session['username'] }} ▼</button>
-                    <div class="dropdown-content">
-                        <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-                        <a href="{{ url_for('main.badges') }}">Badges</a>
-                        <a href="{{ url_for('main.logout') }}">Logout</a>
-                    </div>
-                </div>
-            {% else %}
-                <a href="{{ url_for('main.register') }}" class="btn">Register</a>
-                <a href="{{ url_for('main.login') }}" class="btn btn-outline">Login</a>
-            {% endif %}
-        </div>
+        {% else %}
+        <a href="{{ url_for('main.register') }}" class="btn">Register</a>
+        <a href="{{ url_for('main.login') }}" class="btn btn-outline">Login</a>
+        {% endif %}
+      </div>
     </nav>
-    
-    
 
     <!-- Importance of Habits Section -->
     <section class="importance">
-        <h2>Why Are Habits Important?</h2>
-        <p>
-            Habits shape our daily lives and define our success. 
-            Developing positive habits helps improve productivity, health, and overall well-being. 
-            Tracking habits regularly ensures consistency and long-term progress. 
-            Start today and build a better version of yourself!
-        </p>
+      <h2>Why Are Habits Important?</h2>
+      <p>
+        Habits shape our daily lives and define our success. Developing positive
+        habits helps improve productivity, health, and overall well-being.
+        Tracking habits regularly ensures consistency and long-term progress.
+        Start today and build a better version of yourself!
+      </p>
     </section>
-
-</body>
+  </body>
 </html>
