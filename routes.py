@@ -111,13 +111,37 @@ def badges():
     user_id = session['user_id']
     user_badges = UserBadge.query.filter_by(user_id=user_id).all()
 
-    # Escape descriptions for JavaScript
+    # Escape descriptions for JavaScript and link habits
     for badge in user_badges:
         badge.badge.name_escaped = json.dumps(badge.badge.name)
         badge.badge.description_escaped = json.dumps(badge.badge.description)
         badge.habit = Activity.query.get(badge.habit_id)
 
-    return render_template('badges.html', username=session['username'], badges=user_badges)
+    # Group badges by streak requirement
+    streak_groups = {
+        360: [],
+        180: [],
+        30: [],
+        7: [],
+        1: []
+    }
+
+    for badge in user_badges:
+        if badge.badge and badge.badge.streak_required:
+            if badge.badge.streak_required in streak_groups:
+                streak_groups[badge.badge.streak_required].append(badge)
+
+    # Sort streak groups by highest streak first
+    sorted_streak_groups = {
+        k: streak_groups[k] for k in sorted(streak_groups.keys(), reverse=True)
+    }
+
+    return render_template(
+        'badges.html',
+        username=session['username'],
+        streak_groups=sorted_streak_groups
+    )
+
 
 # Add a New Habit
 @main_bp.route('/add_habit', methods=['POST'])

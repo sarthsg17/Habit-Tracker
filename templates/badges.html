@@ -10,6 +10,7 @@
     />
   </head>
   <body>
+    <!-- Navbar -->
     <nav class="navbar">
       <div class="logo">
         <img
@@ -25,7 +26,7 @@
           <div class="dropdown-content">
             <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('main.badges') }}">Badges</a>
-            <a href="{{ url_for('main.calendar') }}">Calender</a>
+            <a href="{{ url_for('main.calendar') }}">Calendar</a>
             <a href="{{ url_for('main.logout') }}">Logout</a>
           </div>
         </div>
@@ -35,38 +36,41 @@
     <div class="container">
       <h2>Your Badges</h2>
 
+      {% if streak_groups %} {% for streak, badges in streak_groups.items() %}
       {% if badges %}
-      <div class="badge-grid">
-        {% for badge in badges %}
-        <div
-          class="badge-card"
-          onclick="openBadgeModal(
-            '{{ badge.badge.name }}', 
-            '{{ badge.badge.description }}', 
-            '{{ url_for('static', filename='badges/' + badge.badge.image_filename) }}', 
-            '{% if badge.habit %}{{ badge.habit.name }}{% else %}{{ badge.habit_name }}{% endif %}'
-          )"
-        >
-          <img
-            src="{{ url_for('static', filename='badges/' + badge.badge.image_filename) }}"
-            alt="{{ badge.badge.name }}"
-            title="{{ badge.badge.name }}"
-            class="badge-img"
-          />
-          <p>
-            <strong>Habit:</strong> {% if badge.habit %} {{ badge.habit.name }}
-            {% else %} {{ badge.habit_name }}
-            <!-- Show stored name if habit is deleted -->
-            {% endif %}
-          </p>
-          <p>{{ badge.badge.description }}</p>
-          <p class="badge-earned">
-            🏆 Earned on: {{ badge.awarded_at.strftime('%Y-%m-%d') }}
-          </p>
+      <div class="badge-group">
+        <h3>🏆 {{ streak }}-Day Streak Badges</h3>
+        <div class="badge-grid">
+          {% for badge in badges %}
+          <div
+            class="badge-card"
+            onclick="openBadgeModal(
+                      '{{ badge.badge.name }}', 
+                      '{{ badge.badge.description }}', 
+                      '{{ url_for('static', filename='badges/' + badge.badge.image_filename) }}', 
+                      '{% if badge.habit %}{{ badge.habit.name }}{% else %}{{ badge.habit_name }}{% endif %}'
+                    )"
+          >
+            <img
+              src="{{ url_for('static', filename='badges/' + badge.badge.image_filename) }}"
+              alt="{{ badge.badge.name }}"
+              title="{{ badge.badge.name }}"
+              class="badge-img"
+            />
+            <p>
+              <strong>Habit:</strong>
+              {% if badge.habit %} {{ badge.habit.name }} {% else %} {{
+              badge.habit_name }} {% endif %}
+            </p>
+            <p>{{ badge.badge.description }}</p>
+            <p class="badge-earned">
+              🏆 Earned on: {{ badge.awarded_at.strftime('%Y-%m-%d') }}
+            </p>
+          </div>
+          {% endfor %}
         </div>
-        {% endfor %}
       </div>
-      {% else %}
+      {% endif %} {% endfor %} {% else %}
       <p>
         No badges earned yet. Keep tracking your habits to unlock achievements!
       </p>
@@ -79,7 +83,6 @@
         <span class="close" onclick="closeBadgeModal()">&times;</span>
         <h2 id="modalBadgeName"></h2>
         <p id="modalHabitName"></p>
-        <!-- Show Habit Name -->
         <img
           id="modalBadgeImage"
           src=""
@@ -90,6 +93,7 @@
       </div>
     </div>
 
+    <!-- JavaScript for Modal -->
     <script>
       function openBadgeModal(name, description, imageUrl, habitName) {
         document.getElementById("modalBadgeName").innerText = name;
