@@ -26,6 +26,7 @@
         max-width: 900px;
         margin: 20px auto;
       }
+
       .modal {
         display: none;
         position: fixed;
@@ -38,6 +39,7 @@
         background-color: rgba(0, 0, 0, 0.4);
         padding-top: 60px;
       }
+
       .modal-content {
         background-color: #fefefe;
         margin: 5% auto;
@@ -45,28 +47,42 @@
         border: 1px solid #888;
         width: 80%;
       }
+
       .close {
         color: #aaa;
         float: right;
         font-size: 28px;
         font-weight: bold;
-      }
-      .close:hover,
-      .close:focus {
-        color: black;
-        text-decoration: none;
         cursor: pointer;
       }
+
       .event-item {
         margin-bottom: 10px;
         padding: 8px;
         background-color: #e9ecef;
         border-radius: 5px;
       }
+
+      .edit-input {
+        width: 90%;
+        margin-bottom: 10px;
+      }
+
+      .btn {
+        padding: 5px 10px;
+        margin: 5px;
+        cursor: pointer;
+      }
+
+      .note-input {
+        width: 100%;
+        margin-bottom: 10px;
+      }
     </style>
   </head>
+
   <body>
-    <!-- Navigation Bar -->
+    <!-- Navbar -->
     <nav class="navbar">
       <div class="logo">
         <img
@@ -98,16 +114,42 @@
 
     <div id="calendar"></div>
 
-    <!-- Modal to Show Events of a Particular Date -->
+    <!-- Event Details Modal -->
     <div id="eventModal" class="modal">
       <div class="modal-content">
         <span class="close">&times;</span>
         <h2>Events on <span id="selected-date"></span></h2>
         <div id="eventList"></div>
+
+        <!-- Add Note Input -->
+        <textarea
+          id="new-note"
+          class="note-input"
+          placeholder="Add a new note for this day..."
+        ></textarea>
+        <button class="btn btn-primary" onclick="addNote()">Add Note</button>
+      </div>
+    </div>
+
+    <!-- Edit Note Modal -->
+    <div id="editModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Edit Note</h2>
+        <input
+          type="text"
+          id="edit-note-input"
+          class="edit-input"
+          placeholder="Edit your note"
+        />
+        <button class="btn btn-primary" onclick="saveNoteEdit()">Save</button>
       </div>
     </div>
 
     <script>
+      let editNoteId = null;
+      let selectedDate = null;
+
       document.addEventListener("DOMContentLoaded", function () {
         let calendarEl = document.getElementById("calendar");
 
@@ -115,6 +157,7 @@
           initialView: "dayGridMonth",
           selectable: true,
           dateClick: function (info) {
+            selectedDate = info.dateStr;
             fetchEventsByDate(info.dateStr); // Fetch all events of that date
           },
           events: function (fetchInfo, successCallback, failureCallback) {
@@ -152,55 +195,61 @@
         });
 
         calendar.render();
+      });
 
-        // Handle Modal Logic
-        let modal = document.getElementById("eventModal");
-        let closeModal = document.getElementsByClassName("close")[0];
-        let eventList = document.getElementById("eventList");
+      // Fetch Events for Selected Date
+      function fetchEventsByDate(date) {
+        fetch(`/calendar/events_by_date?date=${date}`)
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("selected-date").textContent = date;
 
-        // Function to Fetch Events by Date and Open Modal
-        function fetchEventsByDate(date) {
-          fetch(`/calendar/events_by_date?date=${date}`)
-            .then((response) => response.json())
-            .then((data) => {
-              document.getElementById("selected-date").textContent = date;
+            const eventList = document.getElementById("eventList");
+            eventList.innerHTML = "";
 
-              eventList.innerHTML = ""; // Clear previous events
-              if (data.events.length === 0) {
-                eventList.innerHTML = "<p>No events on this date.</p>";
-              } else {
-                data.events.forEach((event) => {
-                  let eventItem = document.createElement("div");
-                  eventItem.className = "event-item";
+            if (data.events.length === 0) {
+              eventList.innerHTML = "<p>No events on this date.</p>";
+            } else {
+              data.events.forEach((event) => {
+                let eventItem = document.createElement("div");
+                eventItem.className = "event-item";
 
-                  if (event.event_type === "habit_added") {
-                    eventItem.innerHTML = `🟢 Habit Added: <strong>${event.habit_name}</strong>`;
-                  } else if (event.event_type === "habit_completed") {
-                    eventItem.innerHTML = `✔️ Completed: <strong>${event.habit_name}</strong> (Streak: ${event.streak})`;
-                  } else if (event.event_type === "note") {
-                    eventItem.innerHTML = `📝 Note: ${event.note}`;
-                  }
+                if (event.event_type === "habit_added") {
+                  eventItem.innerHTML = `🟢 Habit Added: <strong>${event.habit_name}</strong>`;
+                } else if (event.event_type === "habit_completed") {
+                  eventItem.innerHTML = `✔️ Completed: <strong>${event.habit_name}</strong> (Streak: ${event.streak})`;
+                } else if (event.event_type === "note") {
+                  eventItem.innerHTML = `📝 Note: ${event.note}
+                    <button class="btn btn-edit" onclick="openEditModal(${event.id}, '${event.note}')">✏️ Edit</button>
+                    <button class="btn btn-delete" onclick="deleteNote(${event.id})">❌ Delete</button>`;
+                }
+                eventList.appendChild(eventItem);
+              });
+            }
 
-                  eventList.appendChild(eventItem);
-                });
-              }
+            document.getElementById("eventModal").style.display = "block";
+          });
+      }
 
-              modal.style.display = "block"; // Show the modal
-            })
-            .catch((error) => console.error("Error fetching events:", error));
-        }
+      // Add Note Functionality
+      function addNote() {
+        const noteText = document.getElementById("new-note").value;
+        if (noteText.trim() === "") return;
 
-        // Close Modal on Close Button Click
-        closeModal.onclick = function () {
-          modal.style.display = "none";
-        };
+        fetch("/calendar/add_note", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ date: selectedDate, note: noteText }),
+        }).then(() => location.reload());
+      }
 
-        // Close Modal on Outside Click
-        window.onclick = function (event) {
-          if (event.target === modal) {
+      // Close Modal
+      document.querySelectorAll(".close").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".modal").forEach((modal) => {
             modal.style.display = "none";
-          }
-        };
+          });
+        });
       });
     </script>
   </body>
