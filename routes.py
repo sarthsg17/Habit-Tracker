@@ -295,26 +295,54 @@ def calendar():
 @main_bp.route('/calendar/events', methods=['GET'])
 def get_calendar_events():
     """
-    Get all calendar events (habits and notes) for the logged-in user.
+    Fetch all calendar events (completed habits and notes) for the logged-in user.
     """
     if 'user_id' not in session:
         return jsonify({"error": "Unauthorized"}), 401
 
     user_id = session['user_id']
+
+    # Fetch calendar notes
     events = CalendarEvent.query.filter_by(user_id=user_id).all()
 
-    event_list = [
-        {
+    # Fetch user habits
+    habits = Activity.query.filter_by(user_id=user_id).all()
+
+    event_list = []
+
+    # Add notes to the event list
+    for event in events:
+        event_list.append({
             "id": event.id,
             "date": event.date.strftime("%Y-%m-%d"),
             "event_type": event.event_type,
             "habit_id": event.habit_id,
             "note": event.note
-        }
-        for event in events
-    ]
+        })
+
+    # Add habits to the event list (for date added and last completed)
+    for habit in habits:
+        # Add event for habit creation date
+        event_list.append({
+            "id": habit.id,
+            "date": habit.date_added.strftime("%Y-%m-%d"),
+            "event_type": "habit_added",
+            "habit_name": habit.name,
+            "streak": habit.streak
+        })
+
+        # Add event for last completed date (if any)
+        if habit.last_completed:
+            event_list.append({
+                "id": habit.id,
+                "date": habit.last_completed.strftime("%Y-%m-%d"),
+                "event_type": "habit_completed",
+                "habit_name": habit.name,
+                "streak": habit.streak
+            })
 
     return jsonify({"events": event_list}), 200
+
 
 
 ### FETCH USER-SPECIFIC HABIT HISTORY ###
@@ -418,3 +446,50 @@ def delete_calendar_note(note_id):
     db.session.commit()
 
     return jsonify({"message": "Note deleted successfully"}), 200
+
+@main_bp.route('/calendar/events_by_date', methods=['GET'])
+def get_events_by_date():
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    user_id = session['user_id']
+    selected_date = request.args.get('date')  # Get the date from the request
+
+    # Fetch notes for the selected date
+    events = CalendarEvent.query.filter_by(user_id=user_id, date=selected_date).all()
+
+    # Fetch habits for the selected date
+    habits = Activity.query.filter_by(user_id=user_id).all()
+
+    event_list = []
+
+    # Add notes to the list
+    for event in events:
+        event_list.append({
+            "id": event.id,
+            "date": event.date.strftime("%Y-%m-%d"),
+            "event_type": event.event_type,
+            "habit_id": event.habit_id,
+            "note": event.note
+        })
+
+    # Add habits that were added or completed on the selected date
+    for habit in habits:
+        if habit.date_added.strftime("%Y-%m-%d") == selected_date:
+            event_list.append({
+                "id": habit.id,
+                "date": habit.date_added.strftime("%Y-%m-%d"),
+                "event_type": "habit_added",
+                "habit_name": habit.name,
+                "streak": habit.streak
+            })
+        if habit.last_completed and habit.last_completed.strftime("%Y-%m-%d") == selected_date:
+            event_list.append({
+                "id": habit.id,
+                "date": habit.last_completed.strftime("%Y-%m-%d"),
+                "event_type": "habit_completed",
+                "habit_name": habit.name,
+                "streak": habit.streak
+            })
+
+    return jsonify({"events": event_list}), 200
