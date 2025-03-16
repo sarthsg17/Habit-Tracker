@@ -243,6 +243,33 @@
         }).then(() => location.reload());
       }
 
+      // Open Edit Note Modal
+function openEditModal(noteId, noteText) {
+  editNoteId = noteId;
+  document.getElementById("edit-note-input").value = noteText;
+  document.getElementById("editModal").style.display = "block";
+}
+
+// Save Edited Note
+function saveNoteEdit() {
+  const updatedNote = document.getElementById("edit-note-input").value;
+  if (updatedNote.trim() === "") return;
+
+  fetch(`/calendar/edit_note/${editNoteId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ note: updatedNote }),
+  }).then(() => location.reload());
+}
+
+// Delete Note
+function deleteNote(noteId) {
+  fetch(`/calendar/delete_note/${noteId}`, {
+    method: "DELETE",
+  }).then(() => location.reload());
+}
+
+
       // Close Modal
       document.querySelectorAll(".close").forEach((btn) => {
         btn.addEventListener("click", () => {
