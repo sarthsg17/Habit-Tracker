@@ -173,7 +173,7 @@
                     };
                   } else if (event.event_type === "habit_completed") {
                     return {
-                      title: `✔️ Completed: ${event.habit_name} (Streak: ${event.streak})`,
+                      title: `✔️ Completed: ${event.habit_name} (Current Streak: ${event.streak})`,
                       start: event.date,
                       color: "#28a745",
                     };
@@ -217,7 +217,7 @@
                 if (event.event_type === "habit_added") {
                   eventItem.innerHTML = `🟢 Habit Added: <strong>${event.habit_name}</strong>`;
                 } else if (event.event_type === "habit_completed") {
-                  eventItem.innerHTML = `✔️ Completed: <strong>${event.habit_name}</strong> (Streak: ${event.streak})`;
+                  eventItem.innerHTML = `✔️ Completed: <strong>${event.habit_name}</strong> (Current Streak: ${event.streak})`;
                 } else if (event.event_type === "note") {
                   eventItem.innerHTML = `📝 Note: ${event.note}
                     <button class="btn btn-edit" onclick="openEditModal(${event.id}, '${event.note}')">✏️ Edit</button>
