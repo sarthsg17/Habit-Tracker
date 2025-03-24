@@ -170,7 +170,7 @@ def manage_habits():
         return redirect(url_for('main.login'))
 
     user_id = session['user_id']
-    habits = Activity.query.filter_by(user_id=user_id).all()
+    habits = Activity.query.filter(Activity.user_id == user_id, Activity.status == "active").all()
 
     return render_template('manage_habits.html', activities=habits)
 
@@ -252,7 +252,8 @@ def confirm_delete(habit_id):
             user_badge.habit_name = habit.name
             user_badge.habit_id = -1  # Remove habit reference but keep badge
         # Now delete the habit itself
-        db.session.delete(habit)
+        if habit:
+            habit.status = "deleted"
         db.session.commit()
 
         flash('Habit deleted successfully!', 'success')

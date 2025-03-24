@@ -26,6 +26,7 @@ class Activity(db.Model):
     streak = db.Column(db.Integer, default=0)
     last_completed = db.Column(db.DateTime, default=None)
     date_added = db.Column(db.Date, default=datetime.utcnow)
+    status = db.Column(db.String(10), default='active')
 
     def complete_habit(self):
         today = datetime.now(timezone.utc).date()
