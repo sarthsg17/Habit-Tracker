@@ -200,6 +200,9 @@ def complete_habit(habit_id):
     else:
         habit.streak = 1
 
+    if habit.streak > habit.highest_streak:
+            habit.highest_streak = habit.streak 
+
     habit.last_completed = datetime.utcnow()
 
     # Check for badge rewards
