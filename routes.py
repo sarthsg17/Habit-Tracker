@@ -217,6 +217,23 @@ def complete_habit(habit_id):
     db.session.commit()
     return redirect(url_for('main.manage_habits'))
 
+@main_bp.route('/toggle_email_notifications', methods=['POST'])
+def toggle_email_notifications():
+    if 'user_id' not in session:
+        return jsonify({'error': 'User not logged in'}), 401
+
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    user.email_notifications = not user.email_notifications
+    db.session.commit()
+
+    # Update session to reflect new value
+    session['user_email_notifications'] = user.email_notifications
+
+    return jsonify({'message': 'Preference updated', 'status': user.email_notifications})
+
 # Create a Badge (Admin Only)
 @main_bp.route('/admin/create_badge', methods=['POST'])
 def create_badge():
