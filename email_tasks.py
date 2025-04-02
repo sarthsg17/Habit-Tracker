@@ -12,13 +12,13 @@ def send_habit_reminder(app, mail, scheduler):
         # print(f"[DEBUG] Checking habits for time: {now}")
 
         # Fix: Ensure reminder time comparison ignores microseconds
-        habits = Activity.query.filter(func.TIME(Activity.reminder_time) == func.TIME(now)).all()
+        habits = Activity.query.filter(func.TIME(Activity.reminder_time) == func.TIME(now)).distinct(Activity.id).all() 
         # print(f"[DEBUG] Found {len(habits)} habits scheduled for reminder.")
 
         for habit in habits:
 
             if habit.last_completed and habit.last_completed.date() == now_date:
-                # print(f"[DEBUG] Skipping reminder for {habit.name}, already completed today.")
+                print(f"[DEBUG] Skipping reminder for {habit.name}, already completed today.")
                 continue  # Skip sending reminder
 
             user = User.query.get(habit.user_id)
@@ -33,7 +33,7 @@ def send_habit_reminder(app, mail, scheduler):
                 
                 try:
                     mail.send(msg)
-                    # print("[SUCCESS] Email sent successfully!")
+                    print("[SUCCESS] Email sent successfully!")
                 except Exception as e:
                     print(f"[ERROR] Email failed to send: {str(e)}")
 
@@ -83,7 +83,7 @@ def send_missed_habits_report(app, mail):
             ]
 
             if missed_habits:
-                # print(f"[DEBUG] Sending missed habit report to {user.email}")
+                print(f"[DEBUG] Sending missed habit report to {user.email}")
                 msg = Message(
                     "Missed Habit Report",
                     sender=app.config['MAIL_USERNAME'],
@@ -98,30 +98,43 @@ def send_missed_habits_report(app, mail):
 
                 try:
                     mail.send(msg)
-                    # print("[SUCCESS] Missed habit report sent successfully!")
+                    print("[SUCCESS] Missed habit report sent successfully!")
                 except Exception as e:
                     print(f"[ERROR] Failed to send missed habit report: {str(e)}")
 
 def schedule_jobs(app, mail, scheduler):
-    if not scheduler.get_job("habit_reminders"):
-        scheduler.add_job(
-            id="habit_reminders",
-            func=send_habit_reminder,
-            trigger="cron",
-            minute="*",
-            timezone="Asia/Kolkata",
-            args=[app, mail, scheduler]
-        )
-        # print("[DEBUG] Habit reminders job scheduled.")
+    try:
+        # Only try to remove jobs if they exist
+        if scheduler.get_job("habit_reminders"):
+            scheduler.remove_job("habit_reminders")
+        if scheduler.get_job("missed_habits_report"):
+            scheduler.remove_job("missed_habits_report")
+    except Exception as e:
+        print(f"[INFO] No existing jobs to remove: {str(e)}")
 
-    if not scheduler.get_job("missed_habits_report"):
-        scheduler.add_job(
-            id="missed_habits_report",
-            func=send_missed_habits_report,
-            trigger="cron",
-            hour=23,
-            minute=00,
-            timezone="Asia/Kolkata",
-            args=[app, mail]
-        )
-        # print("[DEBUG] Missed habits report job scheduled.")
+    # Add jobs with coalesce=True and max_instances=1
+    scheduler.add_job(
+        id="habit_reminders",
+        func=send_habit_reminder,
+        trigger="cron",
+        minute="*",
+        timezone="Asia/Kolkata",
+        args=[app, mail, scheduler],
+        coalesce=True,
+        max_instances=1,
+        replace_existing=True  # This will handle cases where job exists
+    )
+    
+    scheduler.add_job(
+        id="missed_habits_report",
+        func=send_missed_habits_report,
+        trigger="cron",
+        hour=21,
+        minute=17,
+        timezone="Asia/Kolkata",
+        args=[app, mail],
+        coalesce=True,
+        max_instances=1,
+        replace_existing=True
+    )
+    print("[INFO] Jobs scheduled successfully")
