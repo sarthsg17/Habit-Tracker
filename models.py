@@ -10,7 +10,6 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(256), nullable=False)  # Ensure password column exists
-    email_notifications = db.Column(db.Boolean, default=False)
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -25,10 +24,10 @@ class Activity(db.Model):
     name = db.Column(db.String(120), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     streak = db.Column(db.Integer, default=0)
-    highest_streak = db.Column(db.Integer, default=0)  # New column for highest streak
     last_completed = db.Column(db.DateTime, default=None)
     date_added = db.Column(db.Date, default=datetime.utcnow)
     status = db.Column(db.String(10), default='active')
+    reminder_time = db.Column(db.Time, nullable=True)
 
     def complete_habit(self):
         today = datetime.now(timezone.utc).date()
@@ -43,16 +42,11 @@ class Activity(db.Model):
         else:
             self.streak = 1  # Reset streak if a day is missed
 
-        # Update the highest streak
-        if self.streak > self.highest_streak:
-            self.highest_streak = self.streak  # Store highest streak
-
         self.last_completed = datetime.now(timezone.utc)
         db.session.commit()
 
         # Award badge if conditions match
         self.check_and_award_badges()
-
 
     def check_and_award_badges(self):
         badges = Badge.query.filter(Badge.streak_required == self.streak).all()

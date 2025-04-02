@@ -151,11 +151,23 @@ def add_habit():
         return redirect(url_for('main.login'))
 
     habit_name = request.form.get('habit_name')
+    reminder_time_str = request.form.get('reminder_time')  # Get time input as string
+
     if not habit_name:
         flash("Habit name cannot be empty.", "danger")
         return redirect(url_for('main.dashboard'))
 
-    new_habit = Activity(name=habit_name, user_id=session['user_id'])
+    # Convert string input to Python time object
+    reminder_time = None
+    if reminder_time_str:
+        try:
+            reminder_time = datetime.strptime(reminder_time_str, "%H:%M").time()
+        except ValueError:
+            flash("Invalid time format!", "danger")
+            return redirect(url_for('main.dashboard'))
+
+    # Create new habit
+    new_habit = Activity(name=habit_name, reminder_time=reminder_time, user_id=session['user_id'])
     db.session.add(new_habit)
     db.session.commit()
 
@@ -200,9 +212,6 @@ def complete_habit(habit_id):
     else:
         habit.streak = 1
 
-    if habit.streak > habit.highest_streak:
-            habit.highest_streak = habit.streak 
-
     habit.last_completed = datetime.utcnow()
 
     # Check for badge rewards
@@ -216,23 +225,6 @@ def complete_habit(habit_id):
 
     db.session.commit()
     return redirect(url_for('main.manage_habits'))
-
-@main_bp.route('/toggle_email_notifications', methods=['POST'])
-def toggle_email_notifications():
-    if 'user_id' not in session:
-        return jsonify({'error': 'User not logged in'}), 401
-
-    user = User.query.get(session['user_id'])
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
-
-    user.email_notifications = not user.email_notifications
-    db.session.commit()
-
-    # Update session to reflect new value
-    session['user_email_notifications'] = user.email_notifications
-
-    return jsonify({'message': 'Preference updated', 'status': user.email_notifications})
 
 # Create a Badge (Admin Only)
 @main_bp.route('/admin/create_badge', methods=['POST'])
@@ -285,16 +277,27 @@ def confirm_delete(habit_id):
 @main_bp.route('/edit_habit/<int:habit_id>', methods=['GET', 'POST'])
 def edit_habit(habit_id):
     habit = Activity.query.get_or_404(habit_id)
-    
+
     if habit.user_id != session.get('user_id'):
         flash("Unauthorized action!", "danger")
         return redirect(url_for('main.dashboard'))
 
     if request.method == 'POST':
-        new_name = request.form.get('new_name').strip()
+        new_name = request.form.get('new_name', '').strip()
+        reminder_time_str = request.form.get('reminder_time', '').strip()
+
         if not new_name:
             flash("Habit name cannot be empty!", "warning")
             return redirect(url_for('main.edit_habit', habit_id=habit_id))
+
+        # Validate and update reminder time if provided
+        if reminder_time_str:
+            try:
+                reminder_time = datetime.strptime(reminder_time_str, "%H:%M").time()
+                habit.reminder_time = reminder_time
+            except ValueError:
+                flash("Invalid time format! Use HH:MM.", "danger")
+                return redirect(url_for('main.edit_habit', habit_id=habit_id))
 
         habit.name = new_name
         db.session.commit()
@@ -302,6 +305,7 @@ def edit_habit(habit_id):
         return redirect(url_for('main.dashboard'))
 
     return render_template('edit_habit.html', habit=habit)
+
 
 ### DISPLAY CALENDAR PAGE ###
 @main_bp.route('/calendar')
@@ -514,3 +518,27 @@ def get_events_by_date():
             })
 
     return jsonify({"events": event_list}), 200
+
+@main_bp.route('/update_reminder/<int:habit_id>', methods=['POST'])
+def update_reminder(habit_id):
+    habit = Activity.query.get_or_404(habit_id)
+
+    if habit.user_id != session.get('user_id'):
+        flash("Unauthorized action!", "danger")
+        return redirect(url_for('main.dashboard'))
+
+    reminder_time_str = request.form.get('reminder_time', '').strip()
+
+    if not reminder_time_str:
+        flash("Reminder time cannot be empty!", "warning")
+        return redirect(url_for('main.dashboard'))
+
+    try:
+        reminder_time = datetime.strptime(reminder_time_str, "%H:%M").time()
+        habit.reminder_time = reminder_time
+        db.session.commit()
+        flash("Reminder time updated successfully!", "success")
+    except ValueError:
+        flash("Invalid time format! Use HH:MM.", "danger")
+
+    return redirect(url_for('main.dashboard'))
