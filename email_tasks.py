@@ -119,8 +119,8 @@ def schedule_jobs(app, mail, scheduler):
             id="missed_habits_report",
             func=send_missed_habits_report,
             trigger="cron",
-            hour=16,
-            minute=20,
+            hour=23,
+            minute=00,
             timezone="Asia/Kolkata",
             args=[app, mail]
         )
