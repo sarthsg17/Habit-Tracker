@@ -27,6 +27,7 @@ class Activity(db.Model):
     last_completed = db.Column(db.DateTime, default=None)
     date_added = db.Column(db.Date, default=datetime.utcnow)
     status = db.Column(db.String(10), default='active')
+    reminder_time = db.Column(db.Time, nullable=True)
 
     def complete_habit(self):
         today = datetime.now(timezone.utc).date()

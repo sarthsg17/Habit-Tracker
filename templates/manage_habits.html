@@ -26,7 +26,7 @@
           <div class="dropdown-content">
             <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('main.badges') }}">Badges</a>
-            <a href="{{ url_for('main.calendar') }}">Calender</a>
+            <a href="{{ url_for('main.calendar') }}">Calendar</a>
             <a href="{{ url_for('main.logout') }}">Logout</a>
           </div>
         </div>
@@ -41,10 +41,12 @@
       <h2>Your Habits</h2>
 
       <!-- Flash Messages -->
-      {% with messages = get_flashed_messages(with_categories=true) %} {% if
-      messages %} {% for category, message in messages %}
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} 
+      {% for category, message in messages %}
       <div class="flash {{ category }}">{{ message }}</div>
-      {% endfor %} {% endif %} {% endwith %}
+      {% endfor %} 
+      {% endif %} 
+      {% endwith %}
 
       <!-- Habit Form -->
       <form
@@ -58,71 +60,67 @@
           placeholder="Enter a new habit..."
           required
         />
+
+        <!-- Reminder Time Input -->
+        <label for="reminder_time">Set Reminder Time:</label>
+        <input type="time" name="reminder_time" required />
+
         <button type="submit">Add Habit</button>
       </form>
 
       <!-- Habit List -->
       <div class="habit-list">
-        {% if activities %} {% for habit in activities %} {% set
-        badge_milestones = [1, 7, 30, 180, 360] %} {% set next_badge =
-        badge_milestones | select("greaterthan", habit.streak) | list | first %}
+        {% if activities %} 
+        {% for habit in activities %} 
+        {% set badge_milestones = [1, 7, 30, 180, 360] %} 
+        {% set next_badge = badge_milestones | select("greaterthan", habit.streak) | list | first %}
 
         <div class="habit-card">
           <h3>
             {{ habit.name }}
-            <a
-              href="{{ url_for('main.edit_habit', habit_id=habit.id) if habit.id else '#' }}"
-              title="Edit Habit"
-              >✏️</a
-            >
-            <a
-              href="{{ url_for('main.confirm_delete', habit_id=habit.id) }}"
-              title="Delete Habit"
-              >🗑️</a
-            >
+            <a href="{{ url_for('main.edit_habit', habit_id=habit.id) if habit.id else '#' }}" title="Edit Habit">✏️</a>
+            <a href="{{ url_for('main.confirm_delete', habit_id=habit.id) }}" title="Delete Habit">🗑️</a>
           </h3>
+
+          <!-- Display and Edit Reminder Time -->
+          <form action="{{ url_for('main.update_reminder', habit_id=habit.id) }}" method="POST">
+            <label for="reminder_time_{{ habit.id }}">⏰ Reminder Time:</label>
+            <input 
+              type="time" 
+              id="reminder_time_{{ habit.id }}" 
+              name="reminder_time"
+              value="{{ habit.reminder_time.strftime('%H:%M') if habit.reminder_time else '' }}" 
+              required 
+            />
+            <button type="submit" class="update-btn">Update Reminder</button>
+          </form>
 
           <!-- Current Streak Display -->
           <p>Streak: {{ habit.streak }} 🔥</p>
 
           <!-- Progress to Next Badge -->
           {% if next_badge %}
-          <p class="next-badge-info">
-            Next Badge at {{ next_badge }} streaks 🔥
-          </p>
+          <p class="next-badge-info">Next Badge at {{ next_badge }} streaks 🔥</p>
           <div class="progress-container next-badge-bar">
-            <div
-              class="progress-bar-next"
-              style="width: {{ (habit.streak / next_badge) * 100 }}%;"
-            >
+            <div class="progress-bar-next" style="width: {{ (habit.streak / next_badge) * 100 }}%;">
               {{ habit.streak }}/{{ next_badge }}
             </div>
           </div>
           {% else %}
-          <p class="next-badge-info">
-            🎯 You've unlocked all badges! Keep going! 🚀
-          </p>
+          <p class="next-badge-info">🎯 You've unlocked all badges! Keep going! 🚀</p>
           {% endif %}
 
           <!-- Last Completed -->
-          <p>
-            Last Completed: {{ habit.last_completed.strftime('%Y-%m-%d') if
-            habit.last_completed else "Not yet" }}
-          </p>
+          <p>Last Completed: {{ habit.last_completed.strftime('%Y-%m-%d') if habit.last_completed else "Not yet" }}</p>
 
           <!-- Complete Button -->
-          <form
-            action="{{ url_for('main.complete_habit', habit_id=habit.id) }}"
-            method="POST"
-          >
+          <form action="{{ url_for('main.complete_habit', habit_id=habit.id) }}" method="POST">
             <button type="submit" class="complete-btn">Complete ✅</button>
           </form>
         </div>
-        {% endfor %} {% else %}
-        <p>
-          No habits found.
-          <a href="{{ url_for('main.manage_habits') }}">Add a new habit</a>
-        </p>
+        {% endfor %} 
+        {% else %}
+        <p>No habits found. <a href="{{ url_for('main.manage_habits') }}">Add a new habit</a></p>
         {% endif %}
       </div>
     </div>
