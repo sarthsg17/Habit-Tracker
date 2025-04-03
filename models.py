@@ -24,6 +24,8 @@ class Activity(db.Model):
     name = db.Column(db.String(120), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     streak = db.Column(db.Integer, default=0)
+    highest_streak = db.Column(db.Integer, default=0)
+    days_completed = db.Column(db.Integer, default=0)
     last_completed = db.Column(db.DateTime, default=None)
     date_added = db.Column(db.Date, default=datetime.utcnow)
     status = db.Column(db.String(10), default='active')
@@ -39,8 +41,13 @@ class Activity(db.Model):
         # If completed yesterday, increment streak
         if self.last_completed and self.last_completed.date() == (today - timedelta(days=1)):
             self.streak += 1
+            self.days_completed += 1
         else:
             self.streak = 1  # Reset streak if a day is missed
+            self.days_completed += 1
+
+        if self.streak > self.highest_streak:
+            self.highest_streak = self.streak
 
         self.last_completed = datetime.now(timezone.utc)
         db.session.commit()

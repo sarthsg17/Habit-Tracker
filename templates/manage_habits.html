@@ -96,7 +96,11 @@
           </form>
 
           <!-- Current Streak Display -->
-          <p>Streak: {{ habit.streak }} 🔥</p>
+          <p>🔥Streak: {{ habit.streak }} </p>
+
+          <p>🏆Highest Streak: {{ habit.highest_streak }}</p>
+
+          <p>📅Total Days Completed: {{ habit.days_completed }}</p>
 
           <!-- Progress to Next Badge -->
           {% if next_badge %}

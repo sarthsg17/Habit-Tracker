@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit History | Habit Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* General Page Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #4CAF50;
+            padding: 15px 20px;
+        }
+
+        .navbar .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .navbar .app-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .nav-buttons .btn {
+            background: white;
+            color: #4CAF50;
+            padding: 8px 12px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .nav-buttons .btn:hover {
+            background: #45a049;
+            color: white;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #4CAF50;
+            color: white;
+        }
+
+        tr:hover {
+            background: #f1f1f1;
+        }
+
+        /* Badge Icons */
+        .status-active {
+            color: green;
+            font-weight: bold;
+        }
+
+        .status-deleted {
+            color: red;
+            font-weight: bold;
+        }
+
+        .streak-fire {
+            color: orange;
+            font-weight: bold;
+        }
+
+        .highest-streak {
+            color: purple;
+            font-weight: bold;
+        }
+
+        /* No Habits Message */
+        .no-habits {
+            text-align: center;
+            color: #777;
+            font-style: italic;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+          <img
+            src="{{ url_for('static', filename='logo.png') }}"
+            alt="Habit Tracker Logo"
+          />
+          <span class="app-name">Habit Tracker</span>
+        </div>
+  
+        <div class="nav-buttons">
+          <div class="dropdown">
+            <button class="dropbtn">👤 {{ session['username'] }} ▼</button>
+            <div class="dropdown-content">
+              <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+              <a href="{{ url_for('main.badges') }}">Badges</a>
+              <a href="{{ url_for('main.calendar') }}">Calendar</a>
+              <a href="{{ url_for('main.logout') }}">Logout</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+    <div class="container">
+        <h2>📜 Your Habit History</h2>
+
+        {% if habits %}
+        <table>
+            <thead>
+                <tr>
+                    <th>📌 Habit Name</th>
+                    <th>🔥 Streak</th>
+                    <th>🏆 Highest Streak</th>
+                    <th>📅 Days Completed</th>
+                    <th>⏳ Last Completed</th>
+                    <th>📆 Date Added</th>
+                    <th>⚡ Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for habit in habits %}
+                <tr>
+                    <td>{{ habit.name }}</td>
+                    <td class="streak-fire">{{ habit.streak }}</td>
+                    <td class="highest-streak">{{ habit.highest_streak }}</td>
+                    <td>{{ habit.days_completed }}</td>
+                    <td>{{ habit.last_completed.strftime('%Y-%m-%d %H:%M') if habit.last_completed else 'Not Yet' }}</td>
+                    <td>{{ habit.date_added.strftime('%Y-%m-%d') }}</td>
+                    <td class="{{ 'status-active' if habit.status == 'active' else 'status-deleted' }}">
+                        {{ habit.status.capitalize() }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="no-habits">😕 No habits found. Start tracking your progress today!</p>
+        {% endif %}
+    </div>
+</body>
+</html>

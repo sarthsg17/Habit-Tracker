@@ -12,14 +12,14 @@
   <body>
     <nav class="navbar">
       <div class="logo">
-        <span class="app-name">Admin Dashboard</span>
+          <img src="{{ url_for('static', filename='logo.png') }}" alt="Habit Tracker Logo">
+          <span class="app-name">Habit Tracker</span>
       </div>
       <div class="nav-buttons">
-        <a href="{{ url_for('main.logout') }}" class="btn btn-outline"
-          >Logout</a
-        >
+          <a href="{{ url_for('main.dashboard') }}" class="btn">🏠 Dashboard</a>
+          <a href="{{ url_for('main.logout') }}" class="btn btn-outline">🚪 Logout</a>
       </div>
-    </nav>
+  </nav>
 
     <h2 id="badge-form-heading">Create a New Badge</h2>
 

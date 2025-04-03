@@ -209,8 +209,13 @@ def complete_habit(habit_id):
     # Update streak
     if habit.last_completed and habit.last_completed.date() == today - timedelta(days=1):
         habit.streak += 1
+        habit.days_completed += 1
     else:
         habit.streak = 1
+        habit.days_completed += 1
+    
+    if habit.streak > habit.highest_streak:
+            habit.highest_streak = habit.streak
 
     habit.last_completed = datetime.utcnow()
 
@@ -225,6 +230,18 @@ def complete_habit(habit_id):
 
     db.session.commit()
     return redirect(url_for('main.manage_habits'))
+
+@main_bp.route('/habit-history')
+def habit_history():
+    if 'user_id' not in session:
+        flash("Please log in to view your habit history.", "danger")
+        return redirect(url_for('main.login'))
+
+    user_id = session['user_id']
+    habits = Activity.query.filter_by(user_id=user_id).all()
+
+    return render_template('habit_history.html', habits=habits)
+
 
 # Create a Badge (Admin Only)
 @main_bp.route('/admin/create_badge', methods=['POST'])
