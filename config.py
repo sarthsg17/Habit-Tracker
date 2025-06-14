@@ -14,6 +14,6 @@ class Config:
     MAIL_PORT = int(os.getenv('MAIL_PORT', 587))
     MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', 'True') == 'True'
     MAIL_USE_SSL = os.getenv('MAIL_USE_SSL', 'False') == 'True'
-    MAIL_USERNAME = os.getenv('MAIL_USERNAME', 'apikey')  # Must be 'apikey'
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME', 'yzD_vVb7SYWYg6MUOOabAw')  
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER')
