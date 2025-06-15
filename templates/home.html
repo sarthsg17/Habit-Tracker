@@ -6,7 +6,7 @@
     <title>Habit Tracker</title>
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}"
+      href="{{ url_for('static', filename='home.css') }}"
     />
   </head>
   <body>
@@ -14,7 +14,7 @@
     <nav class="navbar">
       <div class="logo">
         <img
-          src="{{ url_for('static', filename='logo.png') }}"
+          src="{{ url_for('static', filename='Habit Tracker(2).png') }}"
           alt="Habit Tracker Logo"
         />
         <span class="app-name">Habit Tracker</span>
@@ -27,7 +27,7 @@
           <div class="dropdown-content">
             <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('main.badges') }}">Badges</a>
-            <a href="{{ url_for('main.calendar') }}">Calender</a>
+            <a href="{{ url_for('main.calendar') }}">Calendar</a>
             <a href="{{ url_for('main.logout') }}">Logout</a>
           </div>
         </div>
@@ -48,5 +48,32 @@
         Start today and build a better version of yourself!
       </p>
     </section>
+
+    <!-- Year Progress Bar Section -->
+    <section class="year-progress">
+      <h2>Year Progress</h2>
+      <div class="progress-container">
+        <div id="progress-bar"></div>
+      </div>
+      <p id="progress-text"></p>
+      <p>What are you going to do with the remaining days?</p>
+      <p>Register in our website and start your progress right away!!</p>
+    </section>
+
+    <!-- JavaScript for Year Progress -->
+    <script>
+      function updateYearProgress() {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), 0, 1); // Jan 1
+        const end = new Date(now.getFullYear() + 1, 0, 1); // Next Jan 1
+
+        const progress = ((now - start) / (end - start)) * 100;
+
+        document.getElementById('progress-bar').style.width = progress.toFixed(2) + '%';
+        document.getElementById('progress-text').innerText = `${progress.toFixed(2)}% of the year completed`;
+      }
+
+      updateYearProgress();
+    </script>
   </body>
 </html>
