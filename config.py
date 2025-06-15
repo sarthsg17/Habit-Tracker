@@ -1,3 +1,4 @@
+import psycopg2
 import os
 from dotenv import load_dotenv
 
@@ -5,7 +6,7 @@ load_dotenv()  # Make sure to load .env variables
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'your_secret_key')
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///habit_tracker.db')
+    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SESSION_TYPE = 'filesystem'
 

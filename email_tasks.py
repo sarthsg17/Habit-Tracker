@@ -3,23 +3,23 @@ from datetime import datetime, timedelta
 from flask_mail import Message
 from models import db, User, Activity
 from sqlalchemy import func
+from sqlalchemy import cast, Time
 
 def send_habit_reminder(app, mail, scheduler):
     with app.app_context():
         ist = pytz.timezone('Asia/Kolkata')
         now = datetime.now(ist).replace(second=0, microsecond=0).time()
-        now_date = datetime.now(ist).date()  # Get current date
-        # print(f"[DEBUG] Checking habits for time: {now}")
+        now_date = datetime.now(ist).date()
 
-        # Fix: Ensure reminder time comparison ignores microseconds
-        habits = Activity.query.filter(func.TIME(Activity.reminder_time) == func.TIME(now)).distinct(Activity.id).all() 
-        # print(f"[DEBUG] Found {len(habits)} habits scheduled for reminder.")
+        # PostgreSQL-compatible query
+        habits = Activity.query.filter(
+            cast(Activity.reminder_time, Time) == now
+        ).distinct(Activity.id).all()
 
         for habit in habits:
-
             if habit.last_completed and habit.last_completed.date() == now_date:
                 print(f"[DEBUG] Skipping reminder for {habit.name}, already completed today.")
-                continue  # Skip sending reminder
+                continue
 
             user = User.query.get(habit.user_id)
             if user:
@@ -30,13 +30,12 @@ def send_habit_reminder(app, mail, scheduler):
                     recipients=[user.email]
                 )
                 msg.body = f"Hello {user.username},\n\nDon't forget to complete your habit: {habit.name}!\n\nStay consistent!"
-                
+
                 try:
                     mail.send(msg)
                     print("[SUCCESS] Email sent successfully!")
                 except Exception as e:
                     print(f"[ERROR] Email failed to send: {str(e)}")
-
                 # Ensure unique job ID for follow-up reminders
                 # followup_job_id = f"followup_{habit.id}_{user.id}"
                 # if not scheduler.get_job(followup_job_id):
