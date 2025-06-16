@@ -279,16 +279,19 @@ def confirm_delete(habit_id):
         user_badges = UserBadge.query.filter_by(habit_id=habit_id).all()
         for user_badge in user_badges:
             user_badge.habit_name = habit.name
-            user_badge.habit_id = -1  # Remove habit reference but keep badge
-        # Now delete the habit itself
+            user_badge.habit_id = None  # ✅ Set to None instead of -1 to avoid FK violation
+
+        # Now delete the habit itself (soft delete)
         if habit:
             habit.status = "deleted"
+        
         db.session.commit()
 
         flash('Habit deleted successfully!', 'success')
         return redirect(url_for('main.manage_habits'))
 
     return render_template('confirm_delete.html', habit=habit)
+
 
 
 @main_bp.route('/edit_habit/<int:habit_id>', methods=['GET', 'POST'])

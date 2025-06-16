@@ -35,10 +35,12 @@
         onmouseover="keepDropdownOpen()"
         onmouseout="startDropdownCloseTimer()"
       >
-        <a href="{{ url_for('main.dashboard') }}" class="block px-4 py-2 hover:bg-gray-100">Dashboard</a>
-        <a href="{{ url_for('main.badges') }}" class="block px-4 py-2 hover:bg-gray-100">Badges</a>
-        <a href="{{ url_for('main.calendar') }}" class="block px-4 py-2 hover:bg-gray-100">Calendar</a>
-        <a href="{{ url_for('main.logout') }}" class="block px-4 py-2 hover:bg-gray-100">Logout</a>
+          <a href="{{ url_for('main.dashboard') }}" class="block px-4 py-2 hover:bg-gray-100">Dashboard</a>
+          <a href="{{ url_for('main.manage_habits') }}" class="block px-4 py-2 hover:bg-gray-100">Add Habits</a>
+          <a href="{{ url_for('main.badges') }}" class="block px-4 py-2 hover:bg-gray-100">Badges</a>
+          <a href="{{ url_for('main.calendar') }}" class="block px-4 py-2 hover:bg-gray-100">Calendar</a>
+          <a href="{{ url_for('main.habit_history') }}" class="block px-4 py-2 hover:bg-gray-100">Habit History</a>
+          <a href="{{ url_for('main.logout') }}" class="block px-4 py-2 hover:bg-gray-100">Logout</a>
       </div>
     </div>
     {% endif %}

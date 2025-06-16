@@ -21,10 +21,12 @@
             👤 {{ session['username'] }} ▼
           </button>
           <div class="absolute hidden group-hover:block right-0 mt-2 bg-white text-indigo-700 rounded-md shadow-lg min-w-[160px] z-10">
-            <a href="{{ url_for('main.dashboard') }}" class="block px-4 py-2 hover:bg-indigo-50">Dashboard</a>
-            <a href="{{ url_for('main.badges') }}" class="block px-4 py-2 hover:bg-indigo-50">Badges</a>
-            <a href="{{ url_for('main.calendar') }}" class="block px-4 py-2 hover:bg-indigo-50">Calendar</a>
-            <a href="{{ url_for('main.logout') }}" class="block px-4 py-2 hover:bg-indigo-50">Logout</a>
+          <a href="{{ url_for('main.dashboard') }}" class="block px-4 py-2 hover:bg-gray-100">Dashboard</a>
+          <a href="{{ url_for('main.manage_habits') }}" class="block px-4 py-2 hover:bg-gray-100">Add Habits</a>
+          <a href="{{ url_for('main.badges') }}" class="block px-4 py-2 hover:bg-gray-100">Badges</a>
+          <a href="{{ url_for('main.calendar') }}" class="block px-4 py-2 hover:bg-gray-100">Calendar</a>
+          <a href="{{ url_for('main.habit_history') }}" class="block px-4 py-2 hover:bg-gray-100">Habit History</a>
+          <a href="{{ url_for('main.logout') }}" class="block px-4 py-2 hover:bg-gray-100">Logout</a>
           </div>
         </div>
         {% else %}
