@@ -17,16 +17,16 @@
       <div class="mt-2 md:mt-0 flex items-center gap-3">
         {% if session['user_id'] %}
         <div class="relative group">
-          <button class="bg-white text-indigo-600 font-medium py-2 px-4 rounded-full focus:outline-none flex items-center gap-1">
+          <button id="dropdownButton" class="bg-white text-indigo-600 font-medium py-2 px-4 rounded-full focus:outline-none flex items-center gap-1">
             👤 {{ session['username'] }} ▼
           </button>
-          <div class="absolute hidden group-hover:block right-0 mt-2 bg-white text-indigo-700 rounded-md shadow-lg min-w-[160px] z-10">
-          <a href="{{ url_for('main.dashboard') }}" class="block px-4 py-2 hover:bg-gray-100">Dashboard</a>
-          <a href="{{ url_for('main.manage_habits') }}" class="block px-4 py-2 hover:bg-gray-100">Add Habits</a>
-          <a href="{{ url_for('main.badges') }}" class="block px-4 py-2 hover:bg-gray-100">Badges</a>
-          <a href="{{ url_for('main.calendar') }}" class="block px-4 py-2 hover:bg-gray-100">Calendar</a>
-          <a href="{{ url_for('main.habit_history') }}" class="block px-4 py-2 hover:bg-gray-100">Habit History</a>
-          <a href="{{ url_for('main.logout') }}" class="block px-4 py-2 hover:bg-gray-100">Logout</a>
+          <div id="dropdownMenu" class="absolute hidden group-hover:block right-0 mt-2 bg-white text-indigo-700 rounded-md shadow-lg min-w-[160px] z-10">
+            <a href="{{ url_for('main.dashboard') }}" class="block px-4 py-2 hover:bg-gray-100">Dashboard</a>
+            <a href="{{ url_for('main.manage_habits') }}" class="block px-4 py-2 hover:bg-gray-100">Add Habits</a>
+            <a href="{{ url_for('main.badges') }}" class="block px-4 py-2 hover:bg-gray-100">Badges</a>
+            <a href="{{ url_for('main.calendar') }}" class="block px-4 py-2 hover:bg-gray-100">Calendar</a>
+            <a href="{{ url_for('main.habit_history') }}" class="block px-4 py-2 hover:bg-gray-100">Habit History</a>
+            <a href="{{ url_for('main.logout') }}" class="block px-4 py-2 hover:bg-gray-100">Logout</a>
           </div>
         </div>
         {% else %}
@@ -35,6 +35,7 @@
         {% endif %}
       </div>
     </nav>
+
 
     <!-- Main Content -->
     <main class="flex-grow">
@@ -76,5 +77,31 @@
       }
       updateYearProgress();
     </script>
+    <script>
+      let dropdownTimeout;
+
+      function showDropdown() {
+        clearTimeout(dropdownTimeout);
+        document.getElementById('dropdownMenu').classList.remove('hidden');
+      }
+
+      function hideDropdownWithDelay() {
+        dropdownTimeout = setTimeout(() => {
+          document.getElementById('dropdownMenu').classList.add('hidden');
+        }, 1000); // 5 seconds
+      }
+
+      window.addEventListener('DOMContentLoaded', () => {
+        const button = document.getElementById('dropdownButton');
+        const menu = document.getElementById('dropdownMenu');
+
+        button.addEventListener('mouseenter', showDropdown);
+        button.addEventListener('mouseleave', hideDropdownWithDelay);
+        
+        menu.addEventListener('mouseenter', showDropdown);
+        menu.addEventListener('mouseleave', hideDropdownWithDelay);
+      });
+    </script>
+
   </body>
 </html>
