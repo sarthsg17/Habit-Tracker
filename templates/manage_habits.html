@@ -1,132 +1,141 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard | Habit Tracker</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}"
-    />
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-    <nav class="navbar">
-      <div class="logo">
-        <img
-          src="{{ url_for('static', filename='logo.png') }}"
-          alt="Habit Tracker Logo"
-        />
-        <span class="app-name">Habit Tracker</span>
-      </div>
+  <body class="bg-gradient-to-br from-slate-100 via-purple-50 to-pink-50 min-h-screen font-sans">
+  <!-- Navbar -->
+  <!-- inside <body> before main content -->
+  <nav class="bg-indigo-600 text-white shadow-md px-4 py-3 flex flex-wrap justify-between items-center">
+    <div class="flex items-center gap-3">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="w-10 h-10" />
+      <span class="text-2xl font-semibold">Habit Tracker</span>
+    </div>
 
-      <div class="nav-buttons">
-        {% if session['user_id'] %}
-        <div class="dropdown">
-          <button class="dropbtn">👤 {{ session['username'] }} ▼</button>
-          <div class="dropdown-content">
-            <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('main.badges') }}">Badges</a>
-            <a href="{{ url_for('main.calendar') }}">Calendar</a>
-            <a href="{{ url_for('main.logout') }}">Logout</a>
-          </div>
-        </div>
-        {% else %}
-        <a href="{{ url_for('main.register') }}" class="btn">Register</a>
-        <a href="{{ url_for('main.login') }}" class="btn btn-outline">Login</a>
-        {% endif %}
+    {% if session['user_id'] %}
+    <!-- ✅ Updated Dropdown with JS hover logic -->
+    <div class="relative" id="userDropdown">
+      <button
+        class="bg-white text-indigo-600 px-4 py-2 rounded-full font-medium hover:bg-indigo-100"
+        onclick="toggleDropdown()"
+        onmouseover="keepDropdownOpen()"
+        onmouseout="startDropdownCloseTimer()"
+      >
+        👤 {{ session['username'] }} ▼
+      </button>
+      <div
+        id="dropdownMenu"
+        class="absolute right-0 mt-2 hidden bg-white text-gray-800 shadow-lg rounded-md z-10 w-48"
+        onmouseover="keepDropdownOpen()"
+        onmouseout="startDropdownCloseTimer()"
+      >
+        <a href="{{ url_for('main.dashboard') }}" class="block px-4 py-2 hover:bg-gray-100">Dashboard</a>
+        <a href="{{ url_for('main.badges') }}" class="block px-4 py-2 hover:bg-gray-100">Badges</a>
+        <a href="{{ url_for('main.calendar') }}" class="block px-4 py-2 hover:bg-gray-100">Calendar</a>
+        <a href="{{ url_for('main.logout') }}" class="block px-4 py-2 hover:bg-gray-100">Logout</a>
       </div>
-    </nav>
+    </div>
+    {% endif %}
+  </nav>
 
-    <div class="container">
-      <h2>Your Habits</h2>
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-8 px-4">
+      <h2 class="text-3xl font-bold text-center text-indigo-700 mb-6">Your Habits</h2>
 
       <!-- Flash Messages -->
-      {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} 
-      {% for category, message in messages %}
-      <div class="flash {{ category }}">{{ message }}</div>
-      {% endfor %} 
-      {% endif %} 
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="space-y-2 mb-4">
+            {% for category, message in messages %}
+              <div class="p-3 rounded text-sm
+                {% if category == 'success' %} bg-green-100 text-green-800
+                {% elif category == 'error' or category == 'danger' %} bg-red-100 text-red-800
+                {% else %} bg-yellow-100 text-yellow-800 {% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
       {% endwith %}
 
       <!-- Habit Form -->
-      <form
-        method="POST"
-        action="{{ url_for('main.add_habit') }}"
-        class="habit-form"
-      >
-        <input
-          type="text"
-          name="habit_name"
-          placeholder="Enter a new habit..."
-          required
-        />
-
-        <!-- Reminder Time Input -->
-        <label for="reminder_time">Set Reminder Time:</label>
-        <input type="time" name="reminder_time" required />
-
-        <button type="submit">Add Habit</button>
+      <form method="POST" action="{{ url_for('main.add_habit') }}" class="mb-8 bg-white p-4 rounded shadow space-y-4">
+        <input type="text" name="habit_name" placeholder="Enter a new habit..." required class="w-full px-4 py-2 border border-gray-300 rounded" />
+        <label class="block text-sm font-medium text-gray-700">Set Reminder Time:</label>
+        <input type="time" name="reminder_time" required class="w-full px-4 py-2 border border-gray-300 rounded" />
+        <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700">Add Habit</button>
       </form>
 
-      <!-- Habit List -->
-      <div class="habit-list">
-        {% if activities %} 
-        {% for habit in activities %} 
-        {% set badge_milestones = [1, 7, 30, 180, 360] %} 
-        {% set next_badge = badge_milestones | select("greaterthan", habit.streak) | list | first %}
+      <!-- Habit Cards -->
+      {% if activities %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {% for habit in activities %}
+            {% set badge_milestones = [1, 7, 30, 180, 360] %}
+            {% set next_badge = badge_milestones | select("greaterthan", habit.streak) | list | first %}
 
-        <div class="habit-card">
-          <h3>
-            {{ habit.name }}
-            <a href="{{ url_for('main.edit_habit', habit_id=habit.id) if habit.id else '#' }}" title="Edit Habit">✏️</a>
-            <a href="{{ url_for('main.confirm_delete', habit_id=habit.id) }}" title="Delete Habit">🗑️</a>
-          </h3>
+            <div class="bg-white p-6 rounded-xl shadow space-y-3">
+              <div class="flex justify-between items-center">
+                <h3 class="text-xl font-semibold text-indigo-800">{{ habit.name }}</h3>
+                <div class="space-x-2">
+                  <a href="{{ url_for('main.edit_habit', habit_id=habit.id) }}" title="Edit" class="text-yellow-500 hover:text-yellow-600">✏️</a>
+                  <a href="{{ url_for('main.confirm_delete', habit_id=habit.id) }}" title="Delete" class="text-red-500 hover:text-red-600">🗑️</a>
+                </div>
+              </div>
 
-          <!-- Display and Edit Reminder Time -->
-          <form action="{{ url_for('main.update_reminder', habit_id=habit.id) }}" method="POST">
-            <label for="reminder_time_{{ habit.id }}">⏰ Reminder Time:</label>
-            <input 
-              type="time" 
-              id="reminder_time_{{ habit.id }}" 
-              name="reminder_time"
-              value="{{ habit.reminder_time.strftime('%H:%M') if habit.reminder_time else '' }}" 
-              required 
-            />
-            <button type="submit" class="update-btn">Update Reminder</button>
-          </form>
+              <form action="{{ url_for('main.update_reminder', habit_id=habit.id) }}" method="POST" class="space-y-1">
+                <label for="reminder_time_{{ habit.id }}" class="text-sm text-gray-600">⏰ Reminder Time:</label>
+                <input type="time" id="reminder_time_{{ habit.id }}" name="reminder_time" value="{{ habit.reminder_time.strftime('%H:%M') if habit.reminder_time else '' }}" required class="w-full border border-gray-300 px-3 py-2 rounded" />
+                <button type="submit" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">Update Reminder</button>
+              </form>
 
-          <!-- Current Streak Display -->
-          <p>🔥Streak: {{ habit.streak }} </p>
+              <p>🔥 <strong>Streak:</strong> {{ habit.streak }}</p>
+              <p>🏆 <strong>Highest Streak:</strong> {{ habit.highest_streak }}</p>
+              <p>📅 <strong>Total Days Completed:</strong> {{ habit.days_completed }}</p>
 
-          <p>🏆Highest Streak: {{ habit.highest_streak }}</p>
+              {% if next_badge %}
+              <p class="text-sm text-gray-600">Next Badge at {{ next_badge }} streaks 🔥</p>
+              <div class="w-full bg-gray-200 h-4 rounded-full">
+                <div class="h-full bg-indigo-500 rounded-full text-white text-xs flex items-center justify-center" style="width: {{ (habit.streak / next_badge) * 100 }}%">
+                  {{ habit.streak }}/{{ next_badge }}
+                </div>
+              </div>
+              {% else %}
+              <p class="text-green-600 font-medium">🎯 You've unlocked all badges! 🚀</p>
+              {% endif %}
 
-          <p>📅Total Days Completed: {{ habit.days_completed }}</p>
+              <p>Last Completed: {{ habit.last_completed.strftime('%Y-%m-%d') if habit.last_completed else "Not yet" }}</p>
 
-          <!-- Progress to Next Badge -->
-          {% if next_badge %}
-          <p class="next-badge-info">Next Badge at {{ next_badge }} streaks 🔥</p>
-          <div class="progress-container next-badge-bar">
-            <div class="progress-bar-next" style="width: {{ (habit.streak / next_badge) * 100 }}%;">
-              {{ habit.streak }}/{{ next_badge }}
+              <form action="{{ url_for('main.complete_habit', habit_id=habit.id) }}" method="POST">
+                <button type="submit" class="mt-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Complete ✅</button>
+              </form>
             </div>
-          </div>
-          {% else %}
-          <p class="next-badge-info">🎯 You've unlocked all badges! Keep going! 🚀</p>
-          {% endif %}
-
-          <!-- Last Completed -->
-          <p>Last Completed: {{ habit.last_completed.strftime('%Y-%m-%d') if habit.last_completed else "Not yet" }}</p>
-
-          <!-- Complete Button -->
-          <form action="{{ url_for('main.complete_habit', habit_id=habit.id) }}" method="POST">
-            <button type="submit" class="complete-btn">Complete ✅</button>
-          </form>
+          {% endfor %}
         </div>
-        {% endfor %} 
-        {% else %}
-        <p>No habits found. <a href="{{ url_for('main.manage_habits') }}">Add a new habit</a></p>
-        {% endif %}
-      </div>
-    </div>
+      {% else %}
+        <p class="text-center text-gray-600 italic">No habits found. <a href="{{ url_for('main.manage_habits') }}" class="text-indigo-600 hover:underline">Add a new habit</a></p>
+      {% endif %}
+    </main>
+    <script>
+    let dropdownTimeout;
+
+    function toggleDropdown() {
+      const menu = document.getElementById('dropdownMenu');
+      menu.classList.toggle('hidden');
+    }
+
+    function keepDropdownOpen() {
+      clearTimeout(dropdownTimeout);
+      document.getElementById('dropdownMenu').classList.remove('hidden');
+    }
+
+    function startDropdownCloseTimer() {
+      dropdownTimeout = setTimeout(() => {
+        document.getElementById('dropdownMenu').classList.add('hidden');
+      }, 300);
+    }
+  </script>
   </body>
 </html>

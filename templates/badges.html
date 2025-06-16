@@ -1,120 +1,132 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Badges | Habit Tracker</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}"
-    />
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
+  <body class="bg-gray-50 text-gray-800 min-h-screen">
     <!-- Navbar -->
-    <nav class="navbar">
-      <div class="logo">
-        <img
-          src="{{ url_for('static', filename='logo.png') }}"
-          alt="Habit Tracker Logo"
-        />
-        <span class="app-name">Habit Tracker</span>
+    <nav class="bg-indigo-600 text-white shadow-md px-4 py-3 flex flex-wrap justify-between items-center">
+      <div class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="w-10 h-10" />
+        <span class="text-2xl font-semibold">Habit Tracker</span>
       </div>
 
-      <div class="nav-buttons">
-        <div class="dropdown">
-          <button class="dropbtn">👤 {{ session['username'] }} ▼</button>
-          <div class="dropdown-content">
-            <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('main.badges') }}">Badges</a>
-            <a href="{{ url_for('main.calendar') }}">Calendar</a>
-            <a href="{{ url_for('main.logout') }}">Logout</a>
-          </div>
+      <div class="relative" id="userDropdown">
+        <button
+          class="bg-white text-indigo-600 px-4 py-2 rounded-full font-medium hover:bg-indigo-100"
+          onclick="toggleDropdown()"
+          onmouseover="keepDropdownOpen()"
+          onmouseout="startDropdownCloseTimer()"
+        >
+          👤 {{ session['username'] }} ▼
+        </button>
+        <div
+          id="dropdownMenu"
+          class="absolute right-0 mt-2 hidden bg-white text-gray-800 shadow-lg rounded-md z-10"
+          onmouseover="keepDropdownOpen()"
+          onmouseout="startDropdownCloseTimer()"
+        >
+          <a href="{{ url_for('main.dashboard') }}" class="block px-4 py-2 hover:bg-gray-100">Dashboard</a>
+          <a href="{{ url_for('main.badges') }}" class="block px-4 py-2 hover:bg-gray-100">Badges</a>
+          <a href="{{ url_for('main.calendar') }}" class="block px-4 py-2 hover:bg-gray-100">Calendar</a>
+          <a href="{{ url_for('main.logout') }}" class="block px-4 py-2 hover:bg-gray-100">Logout</a>
         </div>
       </div>
     </nav>
 
-    <div class="container">
-      <h2>Your Badges</h2>
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-10">
+      <h2 class="text-3xl font-bold text-indigo-700 mb-8">Your Badges</h2>
 
-      {% if streak_groups %} {% for streak, badges in streak_groups.items() %}
-      {% if badges %}
-      <div class="badge-group">
-        <h3>🏆 {{ streak }}-Day Streak Badges</h3>
-        <div class="badge-grid">
-          {% for badge in badges %}
-          <div
-            class="badge-card"
-            onclick="openBadgeModal(
-                      '{{ badge.badge.name }}', 
-                      '{{ badge.badge.description }}', 
-                      '{{ url_for('static', filename='badges/' + badge.badge.image_filename) }}', 
-                      '{% if badge.habit %}{{ badge.habit.name }}{% else %}{{ badge.habit_name }}{% endif %}'
-                    )"
-          >
-            <img
-              src="{{ url_for('static', filename='badges/' + badge.badge.image_filename) }}"
-              alt="{{ badge.badge.name }}"
-              title="{{ badge.badge.name }}"
-              class="badge-img"
-            />
-            <p>
-              <strong>Habit:</strong>
-              {% if badge.habit %} {{ badge.habit.name }} {% else %} {{
-              badge.habit_name }} {% endif %}
-            </p>
-            <p>{{ badge.badge.description }}</p>
-            <p class="badge-earned">
-              🏆 Earned on: {{ badge.awarded_at.strftime('%Y-%m-%d') }}
-            </p>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %} {% endfor %} {% else %}
-      <p>
-        No badges earned yet. Keep tracking your habits to unlock achievements!
-      </p>
+      {% if streak_groups %}
+        {% for streak, badges in streak_groups.items() %}
+          {% if badges %}
+            <section class="mb-10">
+              <h3 class="text-xl font-semibold text-gray-700 mb-4">🏆 {{ streak }}-Day Streak Badges</h3>
+              <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for badge in badges %}
+                <div
+                  class="bg-white shadow-md rounded-xl p-4 cursor-pointer hover:shadow-lg transition"
+                  onclick="openBadgeModal(
+                    '{{ badge.badge.name }}',
+                    '{{ badge.badge.description }}',
+                    '{{ url_for('static', filename='badges/' + badge.badge.image_filename) }}',
+                    '{% if badge.habit %}{{ badge.habit.name }}{% else %}{{ badge.habit_name }}{% endif %}'
+                  )"
+                >
+                  <img
+                    src="{{ url_for('static', filename='badges/' + badge.badge.image_filename) }}"
+                    alt="{{ badge.badge.name }}"
+                    class="w-20 h-20 mx-auto object-contain mb-4"
+                  />
+                  <p class="text-center font-medium">
+                    <strong>Habit:</strong>
+                    {% if badge.habit %} {{ badge.habit.name }} {% else %} {{ badge.habit_name }} {% endif %}
+                  </p>
+                  <p class="text-center text-sm text-gray-600 mt-1">{{ badge.badge.description }}</p>
+                  <p class="text-center text-xs text-gray-500 mt-2">🏆 Earned on: {{ badge.awarded_at.strftime('%Y-%m-%d') }}</p>
+                </div>
+                {% endfor %}
+              </div>
+            </section>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        <p class="text-gray-600 text-center mt-10">No badges earned yet. Keep tracking your habits to unlock achievements!</p>
       {% endif %}
-    </div>
+    </main>
 
-    <!-- Badge Modal -->
-    <div id="badgeModal" class="modal">
-      <div class="modal-content">
-        <span class="close" onclick="closeBadgeModal()">&times;</span>
-        <h2 id="modalBadgeName"></h2>
-        <p id="modalHabitName"></p>
-        <img
-          id="modalBadgeImage"
-          src=""
-          alt="Badge Image"
-          class="modal-badge-img"
-        />
-        <p id="modalBadgeDescription"></p>
+    <!-- Modal -->
+    <div id="badgeModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden z-50">
+      <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+        <button onclick="closeBadgeModal()" class="absolute top-2 right-3 text-2xl font-bold text-gray-400 hover:text-gray-600">&times;</button>
+        <h2 id="modalBadgeName" class="text-2xl font-bold text-indigo-700 mb-2"></h2>
+        <p id="modalHabitName" class="text-gray-600 mb-2"></p>
+        <img id="modalBadgeImage" src="" alt="Badge Image" class="w-24 h-24 mx-auto mb-4 object-contain" />
+        <p id="modalBadgeDescription" class="text-gray-700 text-center"></p>
       </div>
     </div>
 
-    <!-- JavaScript for Modal -->
+    <!-- JavaScript -->
     <script>
       function openBadgeModal(name, description, imageUrl, habitName) {
         document.getElementById("modalBadgeName").innerText = name;
-        document.getElementById("modalHabitName").innerText =
-          "Habit: " + habitName;
-        document.getElementById("modalBadgeDescription").innerText =
-          description;
+        document.getElementById("modalHabitName").innerText = "Habit: " + habitName;
+        document.getElementById("modalBadgeDescription").innerText = description;
         document.getElementById("modalBadgeImage").src = imageUrl;
-        document.getElementById("badgeModal").style.display = "block";
+        document.getElementById("badgeModal").classList.remove("hidden");
       }
 
       function closeBadgeModal() {
-        document.getElementById("badgeModal").style.display = "none";
+        document.getElementById("badgeModal").classList.add("hidden");
       }
 
-      // Close modal if user clicks outside of content
       window.onclick = function (event) {
-        var modal = document.getElementById("badgeModal");
+        const modal = document.getElementById("badgeModal");
         if (event.target === modal) {
-          modal.style.display = "none";
+          modal.classList.add("hidden");
         }
+      };
+
+      let dropdownTimeout;
+
+      function toggleDropdown() {
+        const menu = document.getElementById('dropdownMenu');
+        menu.classList.toggle('hidden');
+      }
+
+      function keepDropdownOpen() {
+        clearTimeout(dropdownTimeout);
+        document.getElementById('dropdownMenu').classList.remove('hidden');
+      }
+
+      function startDropdownCloseTimer() {
+        dropdownTimeout = setTimeout(() => {
+          document.getElementById('dropdownMenu').classList.add('hidden');
+        }, 300); // delay so user can hover into it
       };
     </script>
   </body>

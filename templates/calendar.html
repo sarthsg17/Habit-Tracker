@@ -1,240 +1,152 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Habit Tracker Calendar</title>
+    <title>Calendar | Habit Tracker</title>
 
-    <!-- FullCalendar CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}"
-    />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- FullCalendar JS -->
+    <!-- FullCalendar CSS & JS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-
-    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <style>
-      #calendar {
-        max-width: 900px;
-        margin: 20px auto;
-      }
-
-      .modal {
-        display: none;
-        position: fixed;
-        z-index: 1;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.4);
-        padding-top: 60px;
-      }
-
-      .modal-content {
-        background-color: #fefefe;
-        margin: 5% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-      }
-
-      .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-      }
-
-      .event-item {
-        margin-bottom: 10px;
-        padding: 8px;
-        background-color: #e9ecef;
-        border-radius: 5px;
-      }
-
-      .edit-input {
-        width: 90%;
-        margin-bottom: 10px;
-      }
-
-      .btn {
-        padding: 5px 10px;
-        margin: 5px;
-        cursor: pointer;
-      }
-
-      .note-input {
-        width: 100%;
-        margin-bottom: 10px;
-      }
-    </style>
   </head>
 
-  <body>
+  <body class="bg-gray-50 text-gray-800 min-h-screen">
     <!-- Navbar -->
-    <nav class="navbar">
-      <div class="logo">
-        <img
-          src="{{ url_for('static', filename='logo.png') }}"
-          alt="Habit Tracker Logo"
-        />
-        <span class="app-name">Habit Tracker</span>
+    <!-- inside <body> before main content -->
+    <nav class="bg-indigo-600 text-white shadow-md px-4 py-3 flex flex-wrap justify-between items-center">
+      <div class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="w-10 h-10" />
+        <span class="text-2xl font-semibold">Habit Tracker</span>
       </div>
 
-      <div class="nav-buttons">
-        {% if session['user_id'] %}
-        <div class="dropdown">
-          <button class="dropbtn">👤 {{ session['username'] }} ▼</button>
-          <div class="dropdown-content">
-            <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('main.badges') }}">Badges</a>
-            <a href="{{ url_for('main.calendar') }}">Calendar</a>
-            <a href="{{ url_for('main.logout') }}">Logout</a>
-          </div>
+      {% if session['user_id'] %}
+      <!-- ✅ Updated Dropdown with JS hover logic -->
+      <div class="relative" id="userDropdown">
+        <button
+          class="bg-white text-indigo-600 px-4 py-2 rounded-full font-medium hover:bg-indigo-100"
+          onclick="toggleDropdown()"
+          onmouseover="keepDropdownOpen()"
+          onmouseout="startDropdownCloseTimer()"
+        >
+          👤 {{ session['username'] }} ▼
+        </button>
+        <div
+          id="dropdownMenu"
+          class="absolute right-0 mt-2 hidden bg-white text-gray-800 shadow-lg rounded-md z-10 w-48"
+          onmouseover="keepDropdownOpen()"
+          onmouseout="startDropdownCloseTimer()"
+        >
+          <a href="{{ url_for('main.dashboard') }}" class="block px-4 py-2 hover:bg-gray-100">Dashboard</a>
+          <a href="{{ url_for('main.badges') }}" class="block px-4 py-2 hover:bg-gray-100">Badges</a>
+          <a href="{{ url_for('main.calendar') }}" class="block px-4 py-2 hover:bg-gray-100">Calendar</a>
+          <a href="{{ url_for('main.logout') }}" class="block px-4 py-2 hover:bg-gray-100">Logout</a>
         </div>
-        {% else %}
-        <a href="{{ url_for('main.register') }}" class="btn">Register</a>
-        <a href="{{ url_for('main.login') }}" class="btn btn-outline">Login</a>
-        {% endif %}
       </div>
+      {% endif %}
     </nav>
 
-    <h2 style="text-align: center">Habit Tracker Calendar</h2>
 
-    <div id="calendar"></div>
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-10">
+      <h2 class="text-3xl font-bold text-indigo-700 text-center mb-8">Habit Tracker Calendar</h2>
+      <div id="calendar" class="bg-white rounded-lg shadow-md p-4"></div>
+    </main>
 
-    <!-- Event Details Modal -->
-    <div id="eventModal" class="modal">
-      <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Events on <span id="selected-date"></span></h2>
-        <div id="eventList"></div>
-
-        <!-- Add Note Input -->
-        <textarea
-          id="new-note"
-          class="note-input"
-          placeholder="Add a new note for this day..."
-        ></textarea>
-        <button class="btn btn-primary" onclick="addNote()">Add Note</button>
+    <!-- Event Modal -->
+    <div id="eventModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden z-50">
+      <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+        <button onclick="closeModals()" class="absolute top-2 right-3 text-2xl font-bold text-gray-400 hover:text-gray-600">&times;</button>
+        <h2 class="text-xl font-semibold text-indigo-700 mb-4">Events on <span id="selected-date"></span></h2>
+        <div id="eventList" class="space-y-4 text-sm text-gray-800"></div>
+        <textarea id="new-note" class="w-full mt-4 border border-gray-300 rounded-md p-2" placeholder="Add a new note..."></textarea>
+        <button class="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md" onclick="addNote()">Add Note</button>
       </div>
     </div>
 
-    <!-- Edit Note Modal -->
-    <div id="editModal" class="modal">
-      <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Edit Note</h2>
-        <input
-          type="text"
-          id="edit-note-input"
-          class="edit-input"
-          placeholder="Edit your note"
-        />
-        <button class="btn btn-primary" onclick="saveNoteEdit()">Save</button>
+    <!-- Edit Modal -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden z-50">
+      <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+        <button onclick="closeModals()" class="absolute top-2 right-3 text-2xl font-bold text-gray-400 hover:text-gray-600">&times;</button>
+        <h2 class="text-xl font-semibold text-indigo-700 mb-4">Edit Note</h2>
+        <input type="text" id="edit-note-input" class="w-full border border-gray-300 rounded-md p-2" />
+        <button class="mt-3 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md" onclick="saveNoteEdit()">Save</button>
       </div>
     </div>
 
+    <!-- JS -->
     <script>
-      let editNoteId = null;
       let selectedDate = null;
+      let editNoteId = null;
 
       document.addEventListener("DOMContentLoaded", function () {
-        let calendarEl = document.getElementById("calendar");
+        const calendarEl = document.getElementById("calendar");
 
-        let calendar = new FullCalendar.Calendar(calendarEl, {
+        const calendar = new FullCalendar.Calendar(calendarEl, {
           initialView: "dayGridMonth",
           selectable: true,
           dateClick: function (info) {
             selectedDate = info.dateStr;
-            fetchEventsByDate(info.dateStr); // Fetch all events of that date
+            fetch(`/calendar/events_by_date?date=${info.dateStr}`)
+              .then((res) => res.json())
+              .then((data) => {
+                document.getElementById("selected-date").textContent = selectedDate;
+                const eventList = document.getElementById("eventList");
+                eventList.innerHTML = "";
+
+                if (data.events.length === 0) {
+                  eventList.innerHTML = "<p>No events on this date.</p>";
+                } else {
+                  data.events.forEach((event) => {
+                    const div = document.createElement("div");
+                    div.className = "bg-gray-100 rounded-md p-3";
+                    if (event.event_type === "habit_added") {
+                      div.innerHTML = `🟢 <strong>${event.habit_name}</strong> added`;
+                    } else if (event.event_type === "habit_completed") {
+                      div.innerHTML = `✔️ Completed <strong>${event.habit_name}</strong> (Streak: ${event.streak})`;
+                    } else if (event.event_type === "note") {
+                      div.innerHTML = `
+                        📝 ${event.note}
+                        <div class="mt-2 flex gap-2">
+                          <button onclick="openEditModal(${event.id}, '${event.note}')" class="text-blue-600 hover:underline">✏️ Edit</button>
+                          <button onclick="deleteNote(${event.id})" class="text-red-600 hover:underline">❌ Delete</button>
+                        </div>`;
+                    }
+                    eventList.appendChild(div);
+                  });
+                }
+
+                document.getElementById("eventModal").classList.remove("hidden");
+              });
           },
           events: function (fetchInfo, successCallback, failureCallback) {
             fetch("/calendar/events")
-              .then((response) => response.json())
+              .then((res) => res.json())
               .then((data) => {
                 const events = data.events.map((event) => {
                   if (event.event_type === "habit_added") {
-                    return {
-                      title: `🟢 Habit Added: ${event.habit_name}`,
-                      start: event.date,
-                      color: "#007bff",
-                    };
+                    return { title: `🟢 ${event.habit_name}`, start: event.date, color: "#4f46e5" };
                   } else if (event.event_type === "habit_completed") {
-                    return {
-                      title: `✔️ Completed: ${event.habit_name} (Current Streak: ${event.streak})`,
-                      start: event.date,
-                      color: "#28a745",
-                    };
+                    return { title: `✔️ ${event.habit_name} (${event.streak})`, start: event.date, color: "#16a34a" };
                   } else if (event.event_type === "note") {
-                    return {
-                      title: `📝 Note: ${event.note}`,
-                      start: event.date,
-                      color: "#f0ad4e",
-                    };
+                    return { title: `📝 ${event.note}`, start: event.date, color: "#f59e0b" };
                   }
                 });
                 successCallback(events);
               })
-              .catch((error) => {
-                console.error("Error fetching events:", error);
-                failureCallback(error);
-              });
-          },
+              .catch(failureCallback);
+          }
         });
 
         calendar.render();
       });
 
-      // Fetch Events for Selected Date
-      function fetchEventsByDate(date) {
-        fetch(`/calendar/events_by_date?date=${date}`)
-          .then((response) => response.json())
-          .then((data) => {
-            document.getElementById("selected-date").textContent = date;
-
-            const eventList = document.getElementById("eventList");
-            eventList.innerHTML = "";
-
-            if (data.events.length === 0) {
-              eventList.innerHTML = "<p>No events on this date.</p>";
-            } else {
-              data.events.forEach((event) => {
-                let eventItem = document.createElement("div");
-                eventItem.className = "event-item";
-
-                if (event.event_type === "habit_added") {
-                  eventItem.innerHTML = `🟢 Habit Added: <strong>${event.habit_name}</strong>`;
-                } else if (event.event_type === "habit_completed") {
-                  eventItem.innerHTML = `✔️ Completed: <strong>${event.habit_name}</strong> (Current Streak: ${event.streak})`;
-                } else if (event.event_type === "note") {
-                  eventItem.innerHTML = `📝 Note: ${event.note}
-                    <button class="btn btn-edit" onclick="openEditModal(${event.id}, '${event.note}')">✏️ Edit</button>
-                    <button class="btn btn-delete" onclick="deleteNote(${event.id})">❌ Delete</button>`;
-                }
-                eventList.appendChild(eventItem);
-              });
-            }
-
-            document.getElementById("eventModal").style.display = "block";
-          });
-      }
-
-      // Add Note Functionality
       function addNote() {
         const noteText = document.getElementById("new-note").value;
-        if (noteText.trim() === "") return;
+        if (!noteText.trim()) return;
 
         fetch("/calendar/add_note", {
           method: "POST",
@@ -243,41 +155,56 @@
         }).then(() => location.reload());
       }
 
-      // Open Edit Note Modal
-function openEditModal(noteId, noteText) {
-  editNoteId = noteId;
-  document.getElementById("edit-note-input").value = noteText;
-  document.getElementById("editModal").style.display = "block";
-}
+      function openEditModal(noteId, noteText) {
+        editNoteId = noteId;
+        document.getElementById("edit-note-input").value = noteText;
+        document.getElementById("editModal").classList.remove("hidden");
+      }
 
-// Save Edited Note
-function saveNoteEdit() {
-  const updatedNote = document.getElementById("edit-note-input").value;
-  if (updatedNote.trim() === "") return;
+      function saveNoteEdit() {
+        const updatedNote = document.getElementById("edit-note-input").value;
+        if (!updatedNote.trim()) return;
 
-  fetch(`/calendar/edit_note/${editNoteId}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ note: updatedNote }),
-  }).then(() => location.reload());
-}
+        fetch(`/calendar/edit_note/${editNoteId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ note: updatedNote }),
+        }).then(() => location.reload());
+      }
 
-// Delete Note
-function deleteNote(noteId) {
-  fetch(`/calendar/delete_note/${noteId}`, {
-    method: "DELETE",
-  }).then(() => location.reload());
-}
+      function deleteNote(noteId) {
+        fetch(`/calendar/delete_note/${noteId}`, {
+          method: "DELETE",
+        }).then(() => location.reload());
+      }
 
+      function closeModals() {
+        document.getElementById("eventModal").classList.add("hidden");
+        document.getElementById("editModal").classList.add("hidden");
+      }
 
-      // Close Modal
-      document.querySelectorAll(".close").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".modal").forEach((modal) => {
-            modal.style.display = "none";
-          });
-        });
-      });
+      window.onclick = function (event) {
+        if (event.target.classList.contains("modal")) {
+          closeModals();
+        }
+      };
+        let dropdownTimeout;
+
+      function toggleDropdown() {
+        const menu = document.getElementById('dropdownMenu');
+        menu.classList.toggle('hidden');
+      }
+
+      function keepDropdownOpen() {
+        clearTimeout(dropdownTimeout);
+        document.getElementById('dropdownMenu').classList.remove('hidden');
+      }
+
+      function startDropdownCloseTimer() {
+        dropdownTimeout = setTimeout(() => {
+          document.getElementById('dropdownMenu').classList.add('hidden');
+        }, 300);
+      }
     </script>
   </body>
 </html>

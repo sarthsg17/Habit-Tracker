@@ -1,20 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <title>Confirm Delete | Habit Tracker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confirm Delete | Habit Tracker</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="container">
-        <h2>Confirm Deletion</h2>
-        <p>Are you sure you want to delete the habit: <strong>{{ habit.name }}</strong>?</p>
-        <form method="POST">
-            <!-- Clicking this button confirms deletion -->
-            <button type="submit" class="delete-btn">Yes, Delete</button>
-        </form>
-        <!-- Cancel button: returns to dashboard -->
-        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline">Cancel</a>
-    </div>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center text-gray-800">
+
+  <div class="bg-white shadow-md rounded-lg p-8 w-full max-w-md text-center">
+    <h2 class="text-2xl font-bold text-red-600 mb-4">Confirm Deletion</h2>
+    <p class="text-lg mb-6">Are you sure you want to delete the habit: <strong class="text-indigo-600">{{ habit.name }}</strong>?</p>
+
+    <form method="POST" class="space-y-4">
+      <!-- Confirm Delete Button -->
+      <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition duration-200">
+        Yes, Delete
+      </button>
+    </form>
+
+    <!-- Cancel Button -->
+    <a href="{{ url_for('main.dashboard') }}"
+       class="mt-4 inline-block w-full border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-md hover:bg-gray-100 transition duration-200">
+      Cancel
+    </a>
+  </div>
+
 </body>
 </html>

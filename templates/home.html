@@ -1,78 +1,77 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Habit Tracker</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='home.css') }}"
-    />
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-      <div class="logo">
-        <img
-          src="{{ url_for('static', filename='Habit Tracker(2).png') }}"
-          alt="Habit Tracker Logo"
-        />
-        <span class="app-name">Habit Tracker</span>
+  <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav class="bg-indigo-600 text-white shadow-md px-4 py-3 flex flex-wrap justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <img src="{{ url_for('static', filename='Habit Tracker(2).png') }}" alt="Logo" class="w-12 h-12" />
+        <span class="text-2xl font-semibold">Habit Tracker</span>
       </div>
 
-      <div class="nav-buttons">
+      <div class="mt-2 md:mt-0 flex items-center gap-3">
         {% if session['user_id'] %}
-        <div class="dropdown">
-          <button class="dropbtn">👤 {{ session['username'] }} ▼</button>
-          <div class="dropdown-content">
-            <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('main.badges') }}">Badges</a>
-            <a href="{{ url_for('main.calendar') }}">Calendar</a>
-            <a href="{{ url_for('main.logout') }}">Logout</a>
+        <div class="relative group">
+          <button class="bg-white text-indigo-600 font-medium py-2 px-4 rounded-full focus:outline-none flex items-center gap-1">
+            👤 {{ session['username'] }} ▼
+          </button>
+          <div class="absolute hidden group-hover:block right-0 mt-2 bg-white text-indigo-700 rounded-md shadow-lg min-w-[160px] z-10">
+            <a href="{{ url_for('main.dashboard') }}" class="block px-4 py-2 hover:bg-indigo-50">Dashboard</a>
+            <a href="{{ url_for('main.badges') }}" class="block px-4 py-2 hover:bg-indigo-50">Badges</a>
+            <a href="{{ url_for('main.calendar') }}" class="block px-4 py-2 hover:bg-indigo-50">Calendar</a>
+            <a href="{{ url_for('main.logout') }}" class="block px-4 py-2 hover:bg-indigo-50">Logout</a>
           </div>
         </div>
         {% else %}
-        <a href="{{ url_for('main.register') }}" class="btn">Register</a>
-        <a href="{{ url_for('main.login') }}" class="btn btn-outline">Login</a>
+        <a href="{{ url_for('main.register') }}" class="bg-white text-indigo-600 font-medium py-2 px-4 rounded-full hover:bg-indigo-100">Register</a>
+        <a href="{{ url_for('main.login') }}" class="border border-white text-white font-medium py-2 px-4 rounded-full hover:bg-white hover:text-indigo-600">Login</a>
         {% endif %}
       </div>
     </nav>
 
-    <!-- Importance of Habits Section -->
-    <section class="importance">
-      <h2>Why Are Habits Important?</h2>
-      <p>
-        Habits shape our daily lives and define our success. Developing positive
-        habits helps improve productivity, health, and overall well-being.
-        Tracking habits regularly ensures consistency and long-term progress.
-        Start today and build a better version of yourself!
-      </p>
-    </section>
+    <!-- Main Content -->
+    <main class="flex-grow">
+      <!-- Importance Section -->
+      <section class="max-w-3xl mx-auto mt-10 bg-white rounded-xl shadow-md p-6 text-center">
+        <h2 class="text-3xl font-bold text-indigo-600 mb-4">Why Are Habits Important?</h2>
+        <p class="text-lg text-gray-700 leading-relaxed">
+          Habits shape our daily lives and define our success. Developing positive habits helps improve productivity, health, and overall well-being.
+          Tracking habits regularly ensures consistency and long-term progress. Start today and build a better version of yourself!
+        </p>
+      </section>
 
-    <!-- Year Progress Bar Section -->
-    <section class="year-progress">
-      <h2>Year Progress</h2>
-      <div class="progress-container">
-        <div id="progress-bar"></div>
-      </div>
-      <p id="progress-text"></p>
-      <p>What are you going to do with the remaining days?</p>
-      <p>Register in our website and start your progress right away!!</p>
-    </section>
+      <!-- Year Progress -->
+      <section class="max-w-3xl mx-auto mt-10 text-center px-4">
+        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Year Progress</h2>
+        <div class="w-full bg-indigo-100 h-6 rounded-full overflow-hidden mb-3">
+          <div id="progress-bar" class="h-full bg-fuchsia-600 transition-all duration-1000" style="width: 0%"></div>
+        </div>
+        <p id="progress-text" class="text-gray-600 font-medium mb-2"></p>
+        <p class="text-gray-700">What are you going to do with the remaining days?</p>
+        <p class="text-indigo-600 font-semibold mt-1">Register on our website and start your progress right away!</p>
+      </section>
+    </main>
 
-    <!-- JavaScript for Year Progress -->
+    <!-- Footer -->
+    <footer class="text-center text-sm text-gray-400 py-4 mt-10">
+      &copy; {{ year }} Habit Tracker. All rights reserved.
+    </footer>
+
+    <!-- JavaScript -->
     <script>
       function updateYearProgress() {
         const now = new Date();
-        const start = new Date(now.getFullYear(), 0, 1); // Jan 1
-        const end = new Date(now.getFullYear() + 1, 0, 1); // Next Jan 1
-
+        const start = new Date(now.getFullYear(), 0, 1);
+        const end = new Date(now.getFullYear() + 1, 0, 1);
         const progress = ((now - start) / (end - start)) * 100;
-
         document.getElementById('progress-bar').style.width = progress.toFixed(2) + '%';
         document.getElementById('progress-text').innerText = `${progress.toFixed(2)}% of the year completed`;
       }
-
       updateYearProgress();
     </script>
   </body>

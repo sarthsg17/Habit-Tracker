@@ -1,187 +1,121 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Habit History | Habit Tracker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <style>
-        /* General Page Styling */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7f6;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        h2 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        /* Navbar */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #4CAF50;
-            padding: 15px 20px;
-        }
-
-        .navbar .logo {
-            display: flex;
-            align-items: center;
-        }
-
-        .navbar .logo img {
-            height: 40px;
-            margin-right: 10px;
-        }
-
-        .navbar .app-name {
-            font-size: 20px;
-            font-weight: bold;
-            color: white;
-        }
-
-        .nav-buttons .btn {
-            background: white;
-            color: #4CAF50;
-            padding: 8px 12px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        .nav-buttons .btn:hover {
-            background: #45a049;
-            color: white;
-        }
-
-        /* Table Styling */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
-
-        th {
-            background: #4CAF50;
-            color: white;
-        }
-
-        tr:hover {
-            background: #f1f1f1;
-        }
-
-        /* Badge Icons */
-        .status-active {
-            color: green;
-            font-weight: bold;
-        }
-
-        .status-deleted {
-            color: red;
-            font-weight: bold;
-        }
-
-        .streak-fire {
-            color: orange;
-            font-weight: bold;
-        }
-
-        .highest-streak {
-            color: purple;
-            font-weight: bold;
-        }
-
-        /* No Habits Message */
-        .no-habits {
-            text-align: center;
-            color: #777;
-            font-style: italic;
-            font-size: 18px;
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Habit History | Habit Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <nav class="navbar">
-        <div class="logo">
-          <img
-            src="{{ url_for('static', filename='logo.png') }}"
-            alt="Habit Tracker Logo"
-          />
-          <span class="app-name">Habit Tracker</span>
-        </div>
-  
-        <div class="nav-buttons">
-          <div class="dropdown">
-            <button class="dropbtn">👤 {{ session['username'] }} ▼</button>
-            <div class="dropdown-content">
-              <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-              <a href="{{ url_for('main.badges') }}">Badges</a>
-              <a href="{{ url_for('main.calendar') }}">Calendar</a>
-              <a href="{{ url_for('main.logout') }}">Logout</a>
-            </div>
-          </div>
-        </div>
-      </nav>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
-    <div class="container">
-        <h2>📜 Your Habit History</h2>
-
-        {% if habits %}
-        <table>
-            <thead>
-                <tr>
-                    <th>📌 Habit Name</th>
-                    <th>🔥 Streak</th>
-                    <th>🏆 Highest Streak</th>
-                    <th>📅 Days Completed</th>
-                    <th>⏳ Last Completed</th>
-                    <th>📆 Date Added</th>
-                    <th>⚡ Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for habit in habits %}
-                <tr>
-                    <td>{{ habit.name }}</td>
-                    <td class="streak-fire">{{ habit.streak }}</td>
-                    <td class="highest-streak">{{ habit.highest_streak }}</td>
-                    <td>{{ habit.days_completed }}</td>
-                    <td>{{ habit.last_completed.strftime('%Y-%m-%d %H:%M') if habit.last_completed else 'Not Yet' }}</td>
-                    <td>{{ habit.date_added.strftime('%Y-%m-%d') }}</td>
-                    <td class="{{ 'status-active' if habit.status == 'active' else 'status-deleted' }}">
-                        {{ habit.status.capitalize() }}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p class="no-habits">😕 No habits found. Start tracking your progress today!</p>
-        {% endif %}
+  <!-- Navbar -->
+  <!-- inside <body> before main content -->
+  <nav class="bg-indigo-600 text-white shadow-md px-4 py-3 flex flex-wrap justify-between items-center">
+    <div class="flex items-center gap-3">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="w-10 h-10" />
+      <span class="text-2xl font-semibold">Habit Tracker</span>
     </div>
+
+    {% if session['user_id'] %}
+    <!-- ✅ Updated Dropdown with JS hover logic -->
+    <div class="relative" id="userDropdown">
+      <button
+        class="bg-white text-indigo-600 px-4 py-2 rounded-full font-medium hover:bg-indigo-100"
+        onclick="toggleDropdown()"
+        onmouseover="keepDropdownOpen()"
+        onmouseout="startDropdownCloseTimer()"
+      >
+        👤 {{ session['username'] }} ▼
+      </button>
+      <div
+        id="dropdownMenu"
+        class="absolute right-0 mt-2 hidden bg-white text-gray-800 shadow-lg rounded-md z-10 w-48"
+        onmouseover="keepDropdownOpen()"
+        onmouseout="startDropdownCloseTimer()"
+      >
+        <a href="{{ url_for('main.dashboard') }}" class="block px-4 py-2 hover:bg-gray-100">Dashboard</a>
+        <a href="{{ url_for('main.badges') }}" class="block px-4 py-2 hover:bg-gray-100">Badges</a>
+        <a href="{{ url_for('main.calendar') }}" class="block px-4 py-2 hover:bg-gray-100">Calendar</a>
+        <a href="{{ url_for('main.logout') }}" class="block px-4 py-2 hover:bg-gray-100">Logout</a>
+      </div>
+    </div>
+    {% endif %}
+  </nav>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 py-10 w-full">
+    <h2 class="text-3xl font-bold text-indigo-700 mb-8 text-center">📜 Your Habit History</h2>
+
+    {% if habits %}
+    <div class="overflow-auto bg-white rounded-lg shadow">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-indigo-600 text-white">
+          <tr>
+            <th class="px-6 py-3 text-sm font-semibold text-center">📌 Habit Name</th>
+            <th class="px-6 py-3 text-sm font-semibold text-center">🔥 Streak</th>
+            <th class="px-6 py-3 text-sm font-semibold text-center">🏆 Highest Streak</th>
+            <th class="px-6 py-3 text-sm font-semibold text-center">📅 Days Completed</th>
+            <th class="px-6 py-3 text-sm font-semibold text-center">⏳ Last Completed</th>
+            <th class="px-6 py-3 text-sm font-semibold text-center">📆 Date Added</th>
+            <th class="px-6 py-3 text-sm font-semibold text-center">⚡ Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 text-center">
+          {% for habit in habits %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4">{{ habit.name }}</td>
+            <td class="px-6 py-4 text-orange-600 font-semibold">{{ habit.streak }}</td>
+            <td class="px-6 py-4 text-purple-600 font-semibold">{{ habit.highest_streak }}</td>
+            <td class="px-6 py-4">{{ habit.days_completed }}</td>
+            <td class="px-6 py-4">
+              {{ habit.last_completed.strftime('%Y-%m-%d %H:%M') if habit.last_completed else 'Not Yet' }}
+            </td>
+            <td class="px-6 py-4">{{ habit.date_added.strftime('%Y-%m-%d') }}</td>
+            <td class="px-6 py-4 font-semibold {{ 'text-green-600' if habit.status == 'active' else 'text-red-500' }}">
+              {{ habit.status.capitalize() }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="mt-8 text-center text-lg text-gray-600 italic">😕 No habits found. Start tracking your progress today!</p>
+    {% endif %}
+  </main>
+
+  <script>
+    const userMenuBtn = document.getElementById("userMenuBtn");
+    const userDropdown = document.getElementById("userDropdown");
+
+    document.addEventListener("click", function (event) {
+      const isClickInside = userMenuBtn.contains(event.target) || userDropdown.contains(event.target);
+      if (isClickInside) {
+        userDropdown.classList.toggle("hidden");
+      } else {
+        userDropdown.classList.add("hidden");
+      }
+    });
+  </script>
+  <script>
+    let dropdownTimeout;
+
+    function toggleDropdown() {
+      const menu = document.getElementById('dropdownMenu');
+      menu.classList.toggle('hidden');
+    }
+
+    function keepDropdownOpen() {
+      clearTimeout(dropdownTimeout);
+      document.getElementById('dropdownMenu').classList.remove('hidden');
+    }
+
+    function startDropdownCloseTimer() {
+      dropdownTimeout = setTimeout(() => {
+        document.getElementById('dropdownMenu').classList.add('hidden');
+      }, 300);
+    }
+  </script>
+
 </body>
 </html>

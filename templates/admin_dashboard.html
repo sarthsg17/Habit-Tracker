@@ -1,84 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard | Habit Tracker</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}"
-    />
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-    <nav class="navbar">
-      <div class="logo">
-          <img src="{{ url_for('static', filename='logo.png') }}" alt="Habit Tracker Logo">
-          <span class="app-name">Habit Tracker</span>
+  <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav class="bg-indigo-600 text-white shadow-md px-4 py-3 flex flex-wrap justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="w-12 h-12" />
+        <span class="text-2xl font-semibold">Habit Tracker</span>
       </div>
-      <div class="nav-buttons">
-          <a href="{{ url_for('main.dashboard') }}" class="btn">🏠 Dashboard</a>
-          <a href="{{ url_for('main.logout') }}" class="btn btn-outline">🚪 Logout</a>
+      <div class="mt-2 md:mt-0 flex items-center gap-3">
+        <a href="{{ url_for('main.dashboard') }}" class="bg-white text-indigo-600 font-medium py-2 px-4 rounded-full hover:bg-indigo-100">🏠 Dashboard</a>
+        <a href="{{ url_for('main.logout') }}" class="border border-white text-white font-medium py-2 px-4 rounded-full hover:bg-white hover:text-indigo-600">🚪 Logout</a>
       </div>
-  </nav>
+    </nav>
 
-    <h2 id="badge-form-heading">Create a New Badge</h2>
+    <!-- Main Content -->
+    <main class="flex-grow max-w-4xl mx-auto px-4 py-10">
+      <!-- Create Badge Form -->
+      <section class="bg-white shadow-md rounded-xl p-6 mb-10">
+        <h2 class="text-2xl font-bold text-indigo-600 mb-6">Create a New Badge</h2>
+        <form method="POST" action="{{ url_for('main.create_badge') }}" enctype="multipart/form-data" class="space-y-4">
+          <div>
+            <label for="name" class="block font-medium text-gray-700 mb-1">Badge Name:</label>
+            <input type="text" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+          </div>
 
-    <form
-      method="POST"
-      action="{{ url_for('main.create_badge') }}"
-      enctype="multipart/form-data"
-      id="badge-form"
-    >
-      <label for="name" class="badge-label">Badge Name:</label>
-      <input type="text" name="name" required class="badge-input" />
+          <div>
+            <label for="streak_required" class="block font-medium text-gray-700 mb-1">Streak Required:</label>
+            <input type="number" name="streak_required" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+          </div>
 
-      <label for="streak_required" class="badge-label">Streak Required:</label>
-      <input
-        type="number"
-        name="streak_required"
-        required
-        class="badge-input"
-      />
+          <div>
+            <label for="description" class="block font-medium text-gray-700 mb-1">Description:</label>
+            <textarea name="description" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"></textarea>
+          </div>
 
-      <label for="description" class="badge-label">Description:</label>
-      <textarea name="description" class="badge-textarea"></textarea>
+          <div>
+            <label for="badge_image" class="block font-medium text-gray-700 mb-1">Badge Image:</label>
+            <input type="file" name="badge_image" accept="image/*" required class="w-full file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-white file:bg-indigo-600 hover:file:bg-indigo-700" />
+          </div>
 
-      <label for="badge_image" class="badge-label">Badge Image:</label>
-      <input
-        type="file"
-        name="badge_image"
-        accept="image/*"
-        required
-        class="badge-file-input"
-      />
+          <button type="submit" class="bg-indigo-600 text-white font-medium py-2 px-6 rounded-lg hover:bg-indigo-700">Create Badge</button>
+        </form>
+      </section>
 
-      <button type="submit" id="badge-submit-btn">Create Badge</button>
-    </form>
+      <!-- Existing Badges -->
+      <section>
+        <h2 class="text-2xl font-bold text-indigo-600 mb-4">Existing Badges</h2>
+        <p class="text-gray-600 mb-6">Total Badges: {{ badges|length }}</p>
+        <ul class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {% for badge in badges %}
+          <li class="bg-white rounded-lg shadow-md p-4 flex flex-col items-center text-center">
+            <img src="{{ url_for('static', filename='badges/' ~ badge.image_filename) }}" alt="Badge Image" class="w-20 h-20 object-contain mb-3" />
+            <strong class="text-lg font-semibold text-indigo-700 mb-1">{{ badge.name }}</strong>
+            <span class="text-sm text-gray-600">Requires {{ badge.streak_required }} days streak</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </section>
+    </main>
 
-    <h2 id="existing-badges-heading">Existing Badges</h2>
-
-    <p id="total-badges">Total Badges: {{ badges|length }}</p>
-
-    <ul id="badge-list">
-      {% for badge in badges %}
-      <li class="badge-item badge-{{ loop.index }}">
-        <img
-          src="{{ url_for('static', filename='badges/' ~ badge.image_filename) }}"
-          alt="Badge Image"
-          class="badge-image"
-          id="badge-img-{{ loop.index }}"
-        />
-
-        <div class="badge-details">
-          <strong class="badge-name" id="badge-name-{{ loop.index }}"
-            >{{ badge.name }}</strong
-          >
-          <span class="badge-streak" id="badge-streak-{{ loop.index }}">
-            Requires {{ badge.streak_required }} days streak
-          </span>
-        </div>
-      </li>
-      {% endfor %}
-    </ul>
+    <!-- Footer -->
+    <footer class="text-center text-sm text-gray-400 py-6">
+      &copy; {{ year }} Habit Tracker Admin Panel. All rights reserved.
+    </footer>
   </body>
 </html>
