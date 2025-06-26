@@ -92,6 +92,12 @@
                 <input type="time" id="reminder_time_{{ habit.id }}" name="reminder_time" value="{{ habit.reminder_time.strftime('%H:%M') if habit.reminder_time else '' }}" required class="w-full border border-gray-300 px-3 py-2 rounded" />
                 <button type="submit" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">Update Reminder</button>
               </form>
+              <form action="{{ url_for('main.toggle_reminder', habit_id=habit.id) }}" method="POST">
+                <button type="submit" class="mt-1 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                  Disable Reminder
+                </button>
+              </form>
+
 
               <p>🔥 <strong>Streak:</strong> {{ habit.streak }}</p>
               <p>🏆 <strong>Highest Streak:</strong> {{ habit.highest_streak }}</p>

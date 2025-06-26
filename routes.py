@@ -562,3 +562,21 @@ def update_reminder(habit_id):
         flash("Invalid time format! Use HH:MM.", "danger")
 
     return redirect(url_for('main.dashboard'))
+
+@main_bp.route('/toggle_reminder/<int:habit_id>', methods=['POST'])
+def toggle_reminder(habit_id):
+    habit = Activity.query.get_or_404(habit_id)
+
+    if habit.user_id != session.get('user_id'):
+        flash("Unauthorized action!", "danger")
+        return redirect(url_for('main.dashboard'))
+
+    # Toggle: if reminder exists, disable it; if not, flash and tell user to use update form
+    if habit.reminder_time:
+        habit.reminder_time = None
+        db.session.commit()
+        flash("Reminder disabled for this habit.", "info")
+    else:
+        flash("Reminder is already disabled. Use 'Update Reminder' to enable it.", "warning")
+
+    return redirect(url_for('main.manage_habits'))
