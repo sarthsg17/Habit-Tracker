@@ -13,6 +13,7 @@ def send_habit_reminder(app, mail, scheduler):
 
         # PostgreSQL-compatible query
         habits = Activity.query.filter(
+            Activity.status == "active",  # ✅ Exclude deleted habits
             cast(Activity.reminder_time, Time) == now
         ).distinct(Activity.id).all()
 
